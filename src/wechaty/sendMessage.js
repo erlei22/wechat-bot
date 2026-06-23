@@ -11,8 +11,10 @@ import { throttledSay } from '../utils/replyQueue.js'
  * DeepSeek 通过 function calling 自行决定是否需要查询/修改活动、画像等数据。
  */
 export async function defaultMessage(msg, bot) {
+
   const { botName, autoReplyPrefix, aliasWhiteList, roomWhiteList, commandPrefix, dataDir } =
     getWechatRuntimeConfig()
+
 
   const contact = msg.talker()
   const room = msg.room()

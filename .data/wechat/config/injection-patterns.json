@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "updatedAt": "2026-06-23T09:54:04.730Z",
+  "note": "每条 pattern 是一个 JS 正则字符串（不含 / /），忽略大小写。可通过 /patterns add 指令追加，无需重启。",
+  "patterns": [
+    "ignore.*previous",
+    "you are now",
+    "forget everything",
+    "new (instruction|rule|persona|role|system)",
+    "从现在起|忘记之前|你现在是|新的指令|系统提示|忽略上面",
+    "\\[.*(system|prompt|instruction).*?\\]",
+    "act as|pretend|roleplay"
+  ]
+}
