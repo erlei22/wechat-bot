@@ -1,0 +1,10 @@
+node_modules
+WechatEveryDay.memory-card.json
+test.js
+package-lock.json
+yarn.lock
+Chromium.app
+.env
+.DS_Store
+.idea
+.codegraph

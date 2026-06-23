@@ -1,0 +1,5 @@
+[tools]
+node = "24"
+
+[env]
+MISE_NODE_MIRROR_URL = "https://npmmirror.com/mirrors/node/"
