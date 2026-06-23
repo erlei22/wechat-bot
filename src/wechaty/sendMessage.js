@@ -2,7 +2,7 @@ import { getDeepseekReplyWithTools } from '../deepseek/index.js'
 import { getWechatRuntimeConfig } from '../config/env.js'
 import { handleAdminCommand } from '../platforms/wechat/commandRouter.js'
 import { loadProfile, formatProfileForPrompt, extractAndUpdateProfile } from '../platforms/wechat/profileStore.js'
-import { getUpcomingGroupEvents, formatEventsForPrompt } from '../platforms/wechat/eventStore.js'
+import { getUpcomingGroupEvents, formatEventsForPrompt, extractEventFromMessage } from '../platforms/wechat/eventStore.js'
 import { BOT_TOOLS, executeTool } from '../platforms/wechat/botTools.js'
 import { throttledSay } from '../utils/replyQueue.js'
 
@@ -65,6 +65,8 @@ export async function defaultMessage(msg, bot) {
       const response = await getDeepseekReplyWithTools(ctx + question, BOT_TOOLS, toolHandler)
       await throttledSay(room, response)
       extractAndUpdateProfile(senderKey, question, response, roomName, dataDir).catch(() => { })
+      // @机器人的消息也可能是活动邀约，顺手提取
+      extractEventFromMessage(question, senderKey, roomName, dataDir).catch(() => { })
       return
     }
 
