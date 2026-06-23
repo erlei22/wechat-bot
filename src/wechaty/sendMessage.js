@@ -77,7 +77,8 @@ export async function defaultMessage(msg, bot) {
       if (profileCtx) ctxParts.push(profileCtx)
       const ctx = ctxParts.join('\n') + '\n'
 
-      const response = await getDeepseekReplyWithTools(ctx + question, BOT_TOOLS, toolHandler)      await throttledSay(contact, response)
+      const response = await getDeepseekReplyWithTools(ctx + question, BOT_TOOLS, toolHandler)
+      await throttledSay(contact, response)
       extractAndUpdateProfile(senderKey, question, response, null, dataDir).catch(() => { })
     }
   } catch (e) {
