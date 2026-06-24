@@ -1,25 +1,21 @@
 {
-  "name": "柴胡",
+  "name": "八爷",
+  "gender": "unknown",
   "groups": [
     "虹桥野生食堂"
   ],
   "tags": [
-    "爱吃鸡翅",
-    "喜欢烧烤",
-    "爱吃辣",
-    "爱看电影",
-    "爱听摇滚"
+    "容易吃腻"
   ],
   "notes": [
     {
-      "text": "用户表示要吃辣味的，偏好辣味食物。",
-      "group": null
+      "text": "上周买了十个翅根，现在不想吃了",
+      "group": "虹桥野生食堂"
     }
   ],
-  "messageCount": 3,
-  "firstSeen": "2026-06-23T11:34:54.852Z",
-  "lastSeen": "2026-06-23T13:11:19.482Z",
-  "gender": "unknown",
+  "messageCount": 0,
+  "firstSeen": "2026-06-24T08:38:47.022Z",
+  "lastSeen": "2026-06-24T08:38:47.022Z",
   "ageRange": "",
   "birthday": "",
   "zodiac": "",

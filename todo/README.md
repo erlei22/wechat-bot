@@ -59,7 +59,7 @@
 
 - [x] [小红书](done/小红书.md)
 - [x] [两步路](done/两步路.md)
-- [ ] [通用 Web 搜索工具](2-外部数据/通用web搜索.md)
+- [x] [通用 Web 搜索工具](done/通用web搜索.md)
 
 - [x] [DeepSeek 对话方式优化](done/deepseek-对话优化.md)
 

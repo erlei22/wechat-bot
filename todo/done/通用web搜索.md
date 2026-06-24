@@ -18,10 +18,10 @@
 
 ## 待办
 
-- [ ] 确认选哪个（倾向 Brave，独立索引 + 便宜）
-- [ ] 加 `web_search(query, site?)` tool：`site` 可选，如 `site:xiaohongshu.com`，让 DeepSeek 决定要不要缩范围
-- [ ] 结果截断：只返回 top 5 摘要，避免 token 爆炸
-- [ ] 国内需要代理，配 `SEARCH_PROXY` 或复用 `HTTPS_PROXY`
+- [x] 确认选哪个 → **Tavily**，国内直连验证通过，1000次/月免费，无需绑卡
+- [x] 加 `web_search(query, include_domains?, max_results?)` tool，DeepSeek 按需调用
+- [ ] 注册 Tavily 账号，将 `TAVILY_API_KEY` 填入 `.env` 后即可启用
+- [x] 真实效果验证：全网搜索正常，小红书因内容需登录无法索引（预期结果）
 
 ## 注意点
 

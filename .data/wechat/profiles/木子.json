@@ -7,9 +7,30 @@
     "幽默调侃"
   ],
   "notes": [
-    "在群里调侃老实人被Zoey的话弄得不知所措，展现幽默感。"
+    {
+      "text": "在群里调侃老实人被Zoey的话弄得不知所措，展现幽默感。",
+      "group": null
+    }
   ],
   "messageCount": 0,
   "firstSeen": "2026-06-23T15:17:18.628Z",
-  "lastSeen": "2026-06-23T15:17:18.628Z"
+  "lastSeen": "2026-06-23T15:17:18.628Z",
+  "gender": "unknown",
+  "ageRange": "",
+  "birthday": "",
+  "zodiac": "",
+  "mbti": "",
+  "occupation": "",
+  "company": "",
+  "city": "",
+  "district": "",
+  "diet": "",
+  "sports": [],
+  "schedule": "",
+  "hobbies": [],
+  "hasCar": null,
+  "canDrive": null,
+  "carInfo": "",
+  "personality": "",
+  "closeFriends": []
 }

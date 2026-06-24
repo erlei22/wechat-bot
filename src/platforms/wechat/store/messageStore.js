@@ -83,6 +83,10 @@ export async function captureWechatMessage(message, bot, options = {}) {
     const isSelf = Boolean(talker?.self?.())
     const msgType = message.type()
     const typeName = bot.Message.Type[msgType] || String(msgType)
+    const text = isText ? message.text() : ''
+
+    // 非文本消息（表情、图片、语音等）text 为空，没有存储价值，跳过
+    if (!text.trim()) return null
 
     const record = {
       id: message.id || `${Date.now()}-${Math.random().toString(36).slice(2)}`,
@@ -94,7 +98,7 @@ export async function captureWechatMessage(message, bot, options = {}) {
       msg_type: msgType,
       type_name: typeName,
       source: isSelf ? 'self' : 'human',
-      text: isText ? message.text() : '',
+      text,
     }
 
     getDb(dataDir).prepare(`

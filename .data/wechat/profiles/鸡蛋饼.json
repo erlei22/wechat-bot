@@ -8,9 +8,30 @@
     "反感做作"
   ],
   "notes": [
-    "认为标点符号和表情过于规整的发言可能是虚假的。"
+    {
+      "text": "认为标点符号和表情过于规整的发言可能是虚假的。",
+      "group": null
+    }
   ],
   "messageCount": 0,
   "firstSeen": "2026-06-23T12:51:35.428Z",
-  "lastSeen": "2026-06-23T12:51:35.428Z"
+  "lastSeen": "2026-06-23T12:51:35.428Z",
+  "gender": "unknown",
+  "ageRange": "",
+  "birthday": "",
+  "zodiac": "",
+  "mbti": "",
+  "occupation": "",
+  "company": "",
+  "city": "",
+  "district": "",
+  "diet": "",
+  "sports": [],
+  "schedule": "",
+  "hobbies": [],
+  "hasCar": null,
+  "canDrive": null,
+  "carInfo": "",
+  "personality": "",
+  "closeFriends": []
 }

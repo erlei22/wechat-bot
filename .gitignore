@@ -8,3 +8,5 @@ Chromium.app
 .DS_Store
 .idea
 .codegraph
+# 日志目录，随时可删
+logs/

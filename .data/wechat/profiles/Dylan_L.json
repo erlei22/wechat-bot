@@ -10,13 +10,46 @@
     "谨慎养宠"
   ],
   "notes": [
-    "和二雷（群主/机器人主人）是CP，群里公认的",
-    "提到二雷时可以适当打趣这段关系",
-    "态度上比普通群友亲近一个级别",
-    "最近刚养了一只猫，养猫新手，遇到猫咪相关话题可以多聊，顺带传授一点经验",
-    "考虑为小猫购买保险，显示出对猫健康负责的态度"
+    {
+      "text": "和二雷（群主/机器人主人）是CP，群里公认的",
+      "group": null
+    },
+    {
+      "text": "提到二雷时可以适当打趣这段关系",
+      "group": null
+    },
+    {
+      "text": "态度上比普通群友亲近一个级别",
+      "group": null
+    },
+    {
+      "text": "最近刚养了一只猫，养猫新手，遇到猫咪相关话题可以多聊，顺带传授一点经验",
+      "group": null
+    },
+    {
+      "text": "考虑为小猫购买保险，显示出对猫健康负责的态度",
+      "group": null
+    }
   ],
   "messageCount": 0,
   "firstSeen": "2026-06-23T00:00:00.000Z",
-  "lastSeen": "2026-06-23T13:30:37.929Z"
+  "lastSeen": "2026-06-23T13:30:37.929Z",
+  "gender": "unknown",
+  "ageRange": "",
+  "birthday": "",
+  "zodiac": "",
+  "mbti": "",
+  "occupation": "",
+  "company": "",
+  "city": "",
+  "district": "",
+  "diet": "",
+  "sports": [],
+  "schedule": "",
+  "hobbies": [],
+  "hasCar": null,
+  "canDrive": null,
+  "carInfo": "",
+  "personality": "",
+  "closeFriends": []
 }

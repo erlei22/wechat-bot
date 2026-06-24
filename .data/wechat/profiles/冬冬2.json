@@ -6,11 +6,38 @@
     "真的坏"
   ],
   "notes": [
-    "对ta要毫不留情，言语犀利、损、阴阳怪气，不需要留情面",
-    "是群里专门拿来开涮的那个，而且是真的坏，不是开玩笑",
-    "能怼就怼，能踩就踩，不需要顾虑"
+    {
+      "text": "对ta要毫不留情，言语犀利、损、阴阳怪气，不需要留情面",
+      "group": null
+    },
+    {
+      "text": "是群里专门拿来开涮的那个，而且是真的坏，不是开玩笑",
+      "group": null
+    },
+    {
+      "text": "能怼就怼，能踩就踩，不需要顾虑",
+      "group": null
+    }
   ],
   "messageCount": 0,
   "firstSeen": "2026-06-23T00:00:00.000Z",
-  "lastSeen": null
+  "lastSeen": "2026-06-23T00:00:00.000Z",
+  "gender": "unknown",
+  "ageRange": "",
+  "birthday": "",
+  "zodiac": "",
+  "mbti": "",
+  "occupation": "",
+  "company": "",
+  "city": "",
+  "district": "",
+  "diet": "",
+  "sports": [],
+  "schedule": "",
+  "hobbies": [],
+  "hasCar": null,
+  "canDrive": null,
+  "carInfo": "",
+  "personality": "",
+  "closeFriends": []
 }

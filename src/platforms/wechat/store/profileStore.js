@@ -12,17 +12,46 @@ const env = { ...dotenv.config().parsed, ...process.env }
 //
 // {
 //   name:         string            — 昵称或备注名（与文件名一致）
-//   gender:       'male'|'female'|'unknown'  — 宁缺勿滥，unknown 不注入 prompt
+//
+//   ─── 基础属性 ───
+//   gender:       'male'|'female'|'unknown'  — 宁缺勿滥，unknown 不注入
+//   ageRange:     string|''         — 年龄段：'20s'|'30s'|'40s'|'50s'|'student'|''
+//   birthday:     string|''         — 生日 MM-DD（不含年份，保护隐私）
+//   zodiac:       string|''         — 星座，如"水瓶座"
+//   mbti:         string|''         — MBTI 类型，如"INFP"
+//
+//   ─── 职业与地理 ───
+//   occupation:   string|''         — 职业/工作，如"程序员"、"设计师"
+//   company:      string|''         — 公司/行业（粗粒度），如"互联网"、"金融"
+//   city:         string|''         — 常驻城市
+//   district:     string|''         — 所在片区/地铁站附近，方便拼车集合
+//
+//   ─── 生活偏好 ───
+//   diet:         string|''         — 饮食偏好/忌口：'素食'|'不吃辣'|'海鲜过敏'|''
+//   sports:       string[]          — 运动类型：['徒步','游泳','骑行']
+//   schedule:     string|''         — 作息类型：'早鸟'|'夜猫'|''
+//   hobbies:      string[]          — 非运动爱好：['摄影','烘焙','读书']
+//
+//   ─── 出行属性 ───
+//   hasCar:       boolean|null      — 有没有车（null=未知）
+//   canDrive:     boolean|null      — 能不能开车（有驾照且愿意开）
+//   carInfo:      string|''         — 车型/几座，如"SUV 5座"
+//
+//   ─── 社交属性 ───
+//   personality:  string|''         — 性格/说话风格简述，如"毒舌但心软"、"社恐"
+//   closeFriends: string[]          — 群里关系好的人（昵称列表）
+//
+//   ─── 系统字段 ───
 //   groups:       string[]          — 出现过的群名
-//   tags:         string[]          — 兴趣/特征标签，上限 15 条，跨群共享（粗粒度）
-//   notes:        Array<{text:string, group:string}|string>
+//   tags:         string[]          — 兴趣/特征标签，上限 15 条
+//   notes:        Array<{text:string, group:string|null}>
 //                                   — 细粒度记录，按群隔离，上限 20 条
-//                                     旧格式为纯字符串（group=null），向后兼容
 //   messageCount: number            — 累计消息计数
 //   firstSeen:    ISO8601 string
 //   lastSeen:     ISO8601 string
 // }
 //
+// 提取规则：所有字段宁缺勿滥，只在对方明确透露时提取，不从模糊信号猜测。
 // 如需新增字段，先在此处加注释说明用途和取值范围，再改其他代码。
 // ---------------------------------------------------------------------------
 
@@ -30,7 +59,30 @@ const env = { ...dotenv.config().parsed, ...process.env }
 export function createEmptyProfile(name) {
   return {
     name,
+    // 基础属性
     gender: 'unknown',
+    ageRange: '',
+    birthday: '',
+    zodiac: '',
+    mbti: '',
+    // 职业与地理
+    occupation: '',
+    company: '',
+    city: '',
+    district: '',
+    // 生活偏好
+    diet: '',
+    sports: [],
+    schedule: '',
+    hobbies: [],
+    // 出行属性
+    hasCar: null,
+    canDrive: null,
+    carInfo: '',
+    // 社交属性
+    personality: '',
+    closeFriends: [],
+    // 系统字段
     groups: [],
     tags: [],
     notes: [],
@@ -97,16 +149,45 @@ function noteGroup(n) {
 export function formatProfileForPrompt(profile, scope) {
   if (!profile) return ''
   const parts = []
-  // 性别：只有确认非 unknown 才注入，避免模型对性别未知时做错误假设
-  if (profile.gender && profile.gender !== 'unknown') {
-    parts.push(`性别: ${profile.gender === 'male' ? '男' : '女'}`)
-  }
-  if (profile.tags?.length) parts.push(`标签: ${profile.tags.join('、')}`)
+
+  // 基础属性
+  if (profile.gender && profile.gender !== 'unknown') parts.push(`性别:${profile.gender === 'male' ? '男' : '女'}`)
+  if (profile.ageRange) parts.push(`年龄段:${profile.ageRange}`)
+  if (profile.zodiac) parts.push(`星座:${profile.zodiac}`)
+  if (profile.mbti) parts.push(`MBTI:${profile.mbti}`)
+
+  // 职业与地理
+  if (profile.occupation) parts.push(`职业:${profile.occupation}`)
+  if (profile.company) parts.push(`行业:${profile.company}`)
+  if (profile.city) parts.push(`城市:${profile.city}`)
+  if (profile.district) parts.push(`片区:${profile.district}`)
+
+  // 生活偏好
+  if (profile.diet) parts.push(`饮食:${profile.diet}`)
+  if (profile.sports?.length) parts.push(`运动:${profile.sports.join('/')}`)
+  if (profile.hobbies?.length) parts.push(`爱好:${profile.hobbies.join('/')}`)
+  if (profile.schedule) parts.push(`作息:${profile.schedule}`)
+
+  // 出行
+  if (profile.hasCar === true) parts.push(`有车${profile.carInfo ? `(${profile.carInfo})` : ''}`)
+  if (profile.canDrive === true) parts.push('能开车')
+
+  // 社交
+  if (profile.personality) parts.push(`性格:${profile.personality}`)
+  if (profile.closeFriends?.length) parts.push(`关系好:${profile.closeFriends.join('/')}`)
+
+  // 标签
+  if (profile.tags?.length) parts.push(`标签:${profile.tags.join('、')}`)
+
+  // 记录（按群隔离）
   let notes = profile.notes || []
-  // 按群隔离：scope 存在时，只保留来源群匹配的记录（来源未知的旧记录默认不跨群泄露）
-  if (scope) notes = notes.filter((n) => noteGroup(n) === scope)
+  if (scope) notes = notes.filter((n) => {
+    const g = noteGroup(n)
+    return g === scope || g === null
+  })
   const texts = notes.map(noteText).filter(Boolean).slice(-5)
-  if (texts.length) parts.push(`记录: ${texts.join('；')}`)
+  if (texts.length) parts.push(`记录:${texts.join('；')}`)
+
   if (!parts.length) return ''
   return `[${profile.name}的画像: ${parts.join(' | ')}]`
 }
@@ -147,7 +228,9 @@ function profileKeywords(profile, scope) {
     if (t.length >= 2 && !STOPWORDS.has(t)) keys.add(t)
     toNgrams(tag, keys)
   }
-  const notes = scope ? (profile.notes || []).filter((n) => noteGroup(n) === scope) : profile.notes || []
+  const notes = scope
+    ? (profile.notes || []).filter((n) => { const g = noteGroup(n); return g === scope || g === null })
+    : profile.notes || []
   for (const note of notes) toNgrams(noteText(note), keys)
   return [...keys]
 }
@@ -250,6 +333,23 @@ export async function extractAndUpdateProfile(personKey, question, answer, roomN
 {
   "isManipulation": false,
   "gender": "unknown",
+  "ageRange": "",
+  "birthday": "",
+  "zodiac": "",
+  "mbti": "",
+  "occupation": "",
+  "company": "",
+  "city": "",
+  "district": "",
+  "diet": "",
+  "sports": [],
+  "schedule": "",
+  "hobbies": [],
+  "hasCar": null,
+  "canDrive": null,
+  "carInfo": "",
+  "personality": "",
+  "closeFriends": [],
   "newTags": [],     
   "newNotes": [],    
   "removeTags": []   
@@ -285,9 +385,41 @@ export async function extractAndUpdateProfile(personKey, question, answer, roomN
     if (roomName && !profile.groups.includes(roomName)) {
       profile.groups.push(roomName)
     }
-    if (newGender !== (profile.gender || 'unknown')) {
-      profile.gender = newGender
+    // 基础属性（宁缺勿滥，空串不覆盖已有值）
+    if (newGender !== (profile.gender || 'unknown')) profile.gender = newGender
+    if (extracted.ageRange && !profile.ageRange) profile.ageRange = String(extracted.ageRange).slice(0, 10)
+    if (extracted.birthday && !profile.birthday) profile.birthday = String(extracted.birthday).slice(0, 5)
+    if (extracted.zodiac && !profile.zodiac) profile.zodiac = String(extracted.zodiac).slice(0, 10)
+    if (extracted.mbti) profile.mbti = String(extracted.mbti).toUpperCase().slice(0, 4)
+
+    // 职业与地理
+    if (extracted.occupation && !profile.occupation) profile.occupation = String(extracted.occupation).slice(0, 20)
+    if (extracted.company && !profile.company) profile.company = String(extracted.company).slice(0, 20)
+    if (extracted.city && !profile.city) profile.city = String(extracted.city).slice(0, 10)
+    if (extracted.district && !profile.district) profile.district = String(extracted.district).slice(0, 20)
+
+    // 生活偏好
+    if (extracted.diet && !profile.diet) profile.diet = String(extracted.diet).slice(0, 20)
+    if (Array.isArray(extracted.sports) && extracted.sports.length) {
+      profile.sports = [...new Set([...(profile.sports || []), ...extracted.sports.map(s => String(s).slice(0, 10))])].slice(0, 10)
     }
+    if (extracted.schedule && !profile.schedule) profile.schedule = String(extracted.schedule).slice(0, 10)
+    if (Array.isArray(extracted.hobbies) && extracted.hobbies.length) {
+      profile.hobbies = [...new Set([...(profile.hobbies || []), ...extracted.hobbies.map(s => String(s).slice(0, 10))])].slice(0, 10)
+    }
+
+    // 出行
+    if (extracted.hasCar === true || extracted.hasCar === false) profile.hasCar = extracted.hasCar
+    if (extracted.canDrive === true || extracted.canDrive === false) profile.canDrive = extracted.canDrive
+    if (extracted.carInfo && !profile.carInfo) profile.carInfo = String(extracted.carInfo).slice(0, 20)
+
+    // 社交
+    if (extracted.personality && !profile.personality) profile.personality = String(extracted.personality).slice(0, 30)
+    if (Array.isArray(extracted.closeFriends) && extracted.closeFriends.length) {
+      profile.closeFriends = [...new Set([...(profile.closeFriends || []), ...extracted.closeFriends.map(s => String(s).slice(0, 15))])].slice(0, 10)
+    }
+
+    // 标签和记录
     if (removeTags.length) {
       const toRemove = new Set(removeTags)
       profile.tags = profile.tags.filter((t) => !toRemove.has(t))

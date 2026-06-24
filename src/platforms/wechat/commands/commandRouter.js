@@ -83,9 +83,29 @@ export async function handleAdminCommand(content, context = {}) {
     const profile = loadProfile(target, config.dataDir)
     if (!profile) return { handled: true, reply: `还没有 ${target} 的画像，多聊几句就有了` }
     const genderLabel = { male: '男 ♂', female: '女 ♀', unknown: '—' }[profile.gender || 'unknown'] ?? '—'
+    const infoPairs = [
+      ['性别', genderLabel],
+      ['年龄段', profile.ageRange],
+      ['星座', profile.zodiac],
+      ['MBTI', profile.mbti],
+      ['职业', profile.occupation],
+      ['行业', profile.company],
+      ['城市', profile.city],
+      ['片区', profile.district],
+      ['饮食', profile.diet],
+      ['运动', profile.sports?.join('/') || ''],
+      ['爱好', profile.hobbies?.join('/') || ''],
+      ['作息', profile.schedule],
+      ['有车', profile.hasCar === true ? `是${profile.carInfo ? `（${profile.carInfo}）` : ''}` : profile.hasCar === false ? '无' : ''],
+      ['能开车', profile.canDrive === true ? '是' : profile.canDrive === false ? '否' : ''],
+      ['性格', profile.personality],
+      ['关系好', profile.closeFriends?.join('/') || ''],
+      ['生日', profile.birthday],
+    ].filter(([, v]) => v && v !== '—')
+
     const lines = [
       `👤 ${profile.name}`,
-      `性别: ${genderLabel}`,
+      ...infoPairs.map(([k, v]) => `${k}: ${v}`),
       `群组: ${profile.groups?.join('、') || '—'}`,
       `标签: ${profile.tags?.join('、') || '—'}`,
       ...(profile.notes?.slice(-8).map((n) => `  • ${noteText(n)}${typeof n === 'object' && n?.group ? `（${n.group}）` : ''}`) || []),

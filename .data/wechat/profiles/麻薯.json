@@ -11,12 +11,42 @@
     "徒步苦难户"
   ],
   "notes": [
-    "对ta要特别好，热情、捧场、高度认可",
-    "在减肥中",
-    "多帮他介绍对象",
-    "用户抱怨群内没有活动安排"
+    {
+      "text": "对ta要特别好，热情、捧场、高度认可",
+      "group": null
+    },
+    {
+      "text": "在减肥中",
+      "group": null
+    },
+    {
+      "text": "多帮他介绍对象",
+      "group": null
+    },
+    {
+      "text": "用户抱怨群内没有活动安排",
+      "group": null
+    }
   ],
   "messageCount": 1,
   "firstSeen": "2026-06-23T00:00:00.000Z",
-  "lastSeen": "2026-06-23T14:08:08.610Z"
+  "lastSeen": "2026-06-23T14:08:08.610Z",
+  "gender": "unknown",
+  "ageRange": "",
+  "birthday": "",
+  "zodiac": "",
+  "mbti": "",
+  "occupation": "",
+  "company": "",
+  "city": "",
+  "district": "",
+  "diet": "",
+  "sports": [],
+  "schedule": "",
+  "hobbies": [],
+  "hasCar": null,
+  "canDrive": null,
+  "carInfo": "",
+  "personality": "",
+  "closeFriends": []
 }

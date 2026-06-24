@@ -1,13 +1,43 @@
 {
   "name": "冬冬1",
   "groups": [],
-  "tags": ["VIP", "特别优待"],
+  "tags": [
+    "VIP",
+    "特别优待"
+  ],
   "notes": [
-    "对ta要特别好，热情、捧场、高度认可",
-    "说什么都对，做什么都厉害，是群里的团宠",
-    "和冬冬2形成鲜明对比——同样是冬冬，待遇天壤之别"
+    {
+      "text": "对ta要特别好，热情、捧场、高度认可",
+      "group": null
+    },
+    {
+      "text": "说什么都对，做什么都厉害，是群里的团宠",
+      "group": null
+    },
+    {
+      "text": "和冬冬2形成鲜明对比——同样是冬冬，待遇天壤之别",
+      "group": null
+    }
   ],
   "messageCount": 0,
   "firstSeen": "2026-06-23T00:00:00.000Z",
-  "lastSeen": null
+  "lastSeen": "2026-06-23T00:00:00.000Z",
+  "gender": "unknown",
+  "ageRange": "",
+  "birthday": "",
+  "zodiac": "",
+  "mbti": "",
+  "occupation": "",
+  "company": "",
+  "city": "",
+  "district": "",
+  "diet": "",
+  "sports": [],
+  "schedule": "",
+  "hobbies": [],
+  "hasCar": null,
+  "canDrive": null,
+  "carInfo": "",
+  "personality": "",
+  "closeFriends": []
 }

@@ -3,12 +3,33 @@ import { loadProfile, formatProfileForPrompt } from '../store/profileStore.js'
 import { saveFeedback } from '../store/feedbackStore.js'
 import { getWeather } from './weather.js'
 import { getDateInfo, getHolidaySchedule } from './calendar.js'
+import { webSearch } from './webSearch.js'
 
 // ---------------------------------------------------------------------------
 // Tool definitions (OpenAI function calling format)
 // ---------------------------------------------------------------------------
 
 export const BOT_TOOLS = [
+  {
+    type: 'function',
+    function: {
+      name: 'web_search',
+      description: '搜索互联网获取实时信息，适合需要最新数据、查找推荐、了解近期事件等场景。可指定搜索范围，如只搜小红书、两步路等。',
+      parameters: {
+        type: 'object',
+        properties: {
+          query: { type: 'string', description: '搜索关键词，用中文搜中文内容效果更好' },
+          include_domains: {
+            type: 'array',
+            items: { type: 'string' },
+            description: '限定搜索的网站域名，如 ["xiaohongshu.com"]、["2bulu.com"]，不填则搜全网',
+          },
+          max_results: { type: 'number', description: '返回结果数，1-10，默认 5' },
+        },
+        required: ['query'],
+      },
+    },
+  },
   {
     type: 'function',
     function: {
@@ -104,6 +125,12 @@ export async function executeTool(toolName, args, ctx) {
   const { roomName, dataDir } = ctx
 
   switch (toolName) {
+    case 'web_search':
+      return await webSearch(args.query, {
+        includeDomains: args.include_domains || [],
+        maxResults: args.max_results || 5,
+      })
+
     case 'get_date_info':
       return getDateInfo(args.date)
 

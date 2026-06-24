@@ -28,7 +28,7 @@ const PENDING_TTL_MS = 5 * 60 * 1000
 
 // LLM 意图识别的每群冷却，控制成本（确认/取消是关键词匹配，不受此限）。
 const classifyCooldown = new Map()
-const CLASSIFY_COOLDOWN_MS = 2 * 60 * 1000
+const CLASSIFY_COOLDOWN_MS = 30 * 1000
 
 // ---------------------------------------------------------------------------
 // 确认 / 取消 关键词识别（代码，确定性）
@@ -95,10 +95,14 @@ function commitPending(pend, roomName, dataDir) {
     const events = loadGroupEvents(roomName, dataDir)
     const newEvent = {
       id: String(Date.now()),
-      ...e,
+      title: e.title,
+      type: e.type || '',
+      date: e.date || '',
+      time: e.time || '',
+      location: e.location || e.meetingPoint || '',
       initiator: pend.initiator,
       participants: e.participants?.length ? [...new Set(e.participants)] : [pend.initiator],
-      drivers: (e.drivers || []).filter((d) => d && d.name),
+      notes: e.notes || '',
       room: roomName,
       status: 'upcoming',
       createdAt: now,
@@ -106,7 +110,14 @@ function commitPending(pend, roomName, dataDir) {
     }
     events.push(newEvent)
     saveGroupEvents(roomName, events, dataDir)
-    return `✅ 活动已记录：${newEvent.title}${newEvent.date ? `（${newEvent.date}${newEvent.time ? ' ' + newEvent.time : ''}）` : ''}`
+    return [
+      `✅ 活动已记录：${newEvent.title}${newEvent.date ? `（${newEvent.date}${newEvent.time ? ' ' + newEvent.time : ''}）` : ''}`,
+      '',
+      `后续操作：`,
+      `• 补充信息 → ${newEvent.initiator} 直接说"集合地点在XX"、"改成8点"，我会自动更新`,
+      `• 想参加 → 找发起者 ${newEvent.initiator} 报名，TA 说了算`,
+      `• 取消活动 → ${newEvent.initiator} 说"取消活动"即可`,
+    ].join('\n')
   }
 
   if (pend.type === 'delete') {
@@ -140,7 +151,13 @@ export function applyEventIntent(intent, { senderKey, roomName, dataDir }) {
       const bits = [e.title]
       if (e.date) bits.push(`${e.date}${e.time ? ' ' + e.time : ''}`)
       if (e.location) bits.push(`@${e.location}`)
-      return `📝 ${senderKey} 要发起活动「${bits.join(' / ')}」吗？回复『确认』我就记下来，回复『取消』忽略。`
+      return [
+        `📝 ${senderKey} 要发起活动「${bits.join(' / ')}」`,
+        '',
+        `👉 ${senderKey} 本人直接在群里发一句「确认」即可记录`,
+        `   发「取消」则忽略`,
+        `   （5分钟内有效，其他人的确认无效）`,
+      ].join('\n')
     }
 
     case 'update': {
@@ -156,7 +173,9 @@ export function applyEventIntent(intent, { senderKey, roomName, dataDir }) {
       events[idx] = mergeEvent(ev, intent.event)
       events[idx].updatedAt = now
       saveGroupEvents(roomName, events, dataDir)
-      return `✅ 已更新「${events[idx].title}」`
+      const updated = events[idx]
+      const info = [updated.date, updated.time, updated.location, updated.meetingPoint].filter(Boolean).join(' / ')
+      return `✅ 已更新「${updated.title}」${info ? `\n当前信息：${info}` : ''}`
     }
 
     case 'delete': {
@@ -169,7 +188,13 @@ export function applyEventIntent(intent, { senderKey, roomName, dataDir }) {
         return `「${ev.title}」是 ${ev.initiator} 发起的，只有 TA 能删除哦～`
       }
       setPending(roomName, { type: 'delete', eventId: ev.id, initiator: senderKey })
-      return `⚠️ 确认删除活动「${ev.title}」吗？回复『确认』删除，回复『取消』放弃。`
+      return [
+        `⚠️ 确认要删除活动「${ev.title}」吗？`,
+        '',
+        `👉 ${senderKey} 本人直接在群里发一句「确认」即删除`,
+        `   发「取消」则保留`,
+        `   （5分钟内有效，其他人的确认无效）`,
+      ].join('\n')
     }
 
     case 'join': {
@@ -179,7 +204,11 @@ export function applyEventIntent(intent, { senderKey, roomName, dataDir }) {
       const ev = events.find((x) => x.id === intent.targetId && x.status !== 'cancelled')
       if (!ev) return null
       const who = ev.initiator || '发起者'
-      return `想参加「${ev.title}」的话，直接找发起者 ${who} 报名确认哈～`
+      const current = (ev.participants || []).join('、') || '暂无'
+      return [
+        `想参加「${ev.title}」？找 ${who} 确认一下～`,
+        `当前参与者：${current}`,
+      ].join('\n')
     }
 
     case 'leave': {
