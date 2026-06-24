@@ -2,10 +2,11 @@ import { analyzeWechatMessages } from '../../analysis/wechatAnalyzer.js'
 import { getWechatRuntimeConfig } from '../../config/env.js'
 import { runOpenCli } from '../../adapters/opencli.js'
 import { loadPatternConfig, addPattern, removePattern } from './patternConfig.js'
-import { loadProfile } from './profileStore.js'
+import { loadProfile, noteText } from './profileStore.js'
 import { loadEventConfig, addEventType, getUpcomingGroupEvents, formatEventsForPrompt } from './eventStore.js'
 import { listFeedback, countFeedback, updateFeedbackStatus, formatFeedbackList } from './feedbackStore.js'
-import { getDeepseekReply } from '../../deepseek/index.js'
+import { listErrors, countErrors, clearErrors, formatErrorList } from './errorStore.js'
+import { logError } from './errorStore.js'
 
 function stripMention(content, botName) {
   return content.replace(botName, '').trim()
@@ -20,29 +21,32 @@ function parseTarget(tokens) {
 }
 
 // ---------------------------------------------------------------------------
-// /help — DeepSeek 根据当前群上下文动态生成，不暴露命令细节
+// /help — 固定工具菜单，不调用 LLM，直接列出可用小工具
 // ---------------------------------------------------------------------------
 
-async function generateHelp(roomName, dataDir) {
-  const events = getUpcomingGroupEvents(roomName, dataDir)
-  const { typeEmojis } = loadEventConfig(dataDir)
-  const knownTypes = Object.keys(typeEmojis).join('、')
-
-  const prompt = `[系统指令: 生成 /help 回复，不要暴露任何命令语法或技术细节]
-
-当前群: ${roomName || '私聊'}
-近期活动数量: ${events.length} 个
-已知活动类型: ${knownTypes}
-
-你能做的事（转化成自然语言介绍给用户，像朋友介绍自己，不是命令手册）：
-- 随便聊，什么话题都行
-- 群里发起活动，自动记录；有人说"我要去"、"算我一个"，自动更新参与者；可以查询谁要去、在哪集合、谁开车
-- 认识群里的朋友，记得大家聊过的事，回复会更有针对性
-- 分析群聊记录
-
-用轻松随意的语气，两三句话说清楚，不要列清单，不要提任何命令或指令。`
-
-  return await getDeepseekReply(prompt)
+function generateHelp(roomName, dataDir) {
+  const eventCount = roomName ? getUpcomingGroupEvents(roomName, dataDir).length : 0
+  const lines = [
+    '🛠 小工具菜单（直接发对应指令）',
+    '',
+    `📅 活动`,
+    `   /活动            查看本群近期活动${roomName ? `（当前 ${eventCount} 个）` : ''}`,
+    `   /活动 类型        查看活动类型`,
+    '',
+    `👤 画像`,
+    `   /画像 <昵称>      查看某人的画像`,
+    '',
+    `📊 群分析`,
+    `   /统计 群          看本群统计，不走 AI`,
+    `   /分析 群          AI 深度分析本群`,
+    `   /分析 好友        分析你自己`,
+    '',
+    `💬 反馈`,
+    `   直接说出你的建议或吐槽，会被自动记录`,
+    '',
+    `❓ /help          再次查看本菜单`,
+  ]
+  return lines.join('\n')
 }
 
 // ---------------------------------------------------------------------------
@@ -63,7 +67,7 @@ export async function handleAdminCommand(content, context = {}) {
 
   // ── /help — user-facing, DeepSeek-generated ──────────────────────────────
   if (command === 'help' || command === '帮助') {
-    const reply = await generateHelp(context.roomName, config.dataDir)
+    const reply = generateHelp(context.roomName, config.dataDir)
     return { handled: true, reply }
   }
 
@@ -77,7 +81,7 @@ export async function handleAdminCommand(content, context = {}) {
       `👤 ${profile.name}`,
       `群组: ${profile.groups?.join('、') || '—'}`,
       `标签: ${profile.tags?.join('、') || '—'}`,
-      ...(profile.notes?.slice(-8).map((n) => `  • ${n}`) || []),
+      ...(profile.notes?.slice(-8).map((n) => `  • ${noteText(n)}${typeof n === 'object' && n?.group ? `（${n.group}）` : ''}`) || []),
       `消息数: ${profile.messageCount || 0}  |  最后活跃: ${profile.lastSeen?.slice(0, 10) || '—'}`,
     ]
     return { handled: true, reply: lines.join('\n') }
@@ -130,13 +134,44 @@ export async function handleAdminCommand(content, context = {}) {
   }
 
   // ── /分析 /统计 ───────────────────────────────────────────────────────────
+  // 权限边界（代码兜底，不交给 LLM）：群分析只能查"当前群"，好友分析默认只能查自己。
   if (['分析', 'analyze', '统计', 'stats'].includes(command)) {
     const statsOnly = ['统计', 'stats'].includes(command)
-    const result = await analyzeWechatMessages({
-      ...parseTarget(tokens),
-      dataDir: config.dataDir,
-      statsOnly,
-    })
+    const roomName = context.roomName
+    const senderKey = context.alias || context.name || ''
+    const target = parseTarget(tokens)
+
+    // 私聊禁用群/好友分析（私聊已关闭，且这类查询涉及隐私边界）
+    if (!roomName) {
+      return { handled: true, reply: '群统计 / 分析只能在群聊里使用哦～' }
+    }
+
+    const analyzeOpts = { dataDir: config.dataDir, statsOnly }
+
+    if ('friend' in target) {
+      // 普通用户最多查自己；传了别人直接拒绝
+      const who = target.friend || senderKey
+      const isSelf = who === senderKey || who === context.name || who === context.alias
+      if (!isSelf) {
+        return { handled: true, reply: '只能分析你自己哦，群里的整体统计请用 /统计 群' }
+      }
+      analyzeOpts.friend = who
+    } else {
+      // 群分析：强制锁定当前群，忽略/拒绝用户传入的其它群名
+      if (target.room && target.room !== roomName) {
+        return { handled: true, reply: `只能统计当前群「${roomName}」，没法查别的群～` }
+      }
+      analyzeOpts.room = roomName
+    }
+
+    let result
+    try {
+      result = await analyzeWechatMessages(analyzeOpts)
+    } catch (e) {
+      logError('command', e, { command, roomName }, config.dataDir)
+      return { handled: true, reply: '分析服务暂时不可用（可能没配置模型 key），可以先用 /统计 看本地数据～' }
+    }
+
     if (statsOnly || !result.analysis) {
       return {
         handled: true,
@@ -191,6 +226,22 @@ export async function handleAdminCommand(content, context = {}) {
     }
 
     return { handled: true, reply: '用法：/反馈 | 全部 | 已处理 <id> | 看过 <id> | 关闭 <id>' }
+  }
+
+  // ── /错误 /errors — 查看运行期错误日志，便于排查 bug ──────────────────────
+  if (command === '错误' || command === 'errors') {
+    const sub = tokens[1]
+
+    if (sub === '清空' || sub === 'clear') {
+      const n = clearErrors(config.dataDir)
+      return { handled: true, reply: `🗑️ 已清空 ${n} 条错误日志` }
+    }
+
+    const scope = sub && sub !== '全部' && sub !== 'all' ? sub : null
+    const total = countErrors({ scope }, config.dataDir)
+    const rows = listErrors({ scope, limit: 10 }, config.dataDir)
+    const header = `🐞 错误日志 (${total} 条${scope ? ` · ${scope}` : ''})：\n`
+    return { handled: true, reply: header + formatErrorList(rows) }
   }
 
   // ── /opencli ──────────────────────────────────────────────────────────────

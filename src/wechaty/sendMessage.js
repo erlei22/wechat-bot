@@ -1,10 +1,26 @@
 import { getDeepseekReplyWithTools } from '../deepseek/index.js'
 import { getWechatRuntimeConfig } from '../config/env.js'
 import { handleAdminCommand } from '../platforms/wechat/commandRouter.js'
-import { loadProfile, formatProfileForPrompt, extractAndUpdateProfile } from '../platforms/wechat/profileStore.js'
-import { getUpcomingGroupEvents, formatEventsForPrompt, extractEventFromMessage } from '../platforms/wechat/eventStore.js'
+import { loadProfile, formatProfileForPrompt, extractAndUpdateProfile, isProfileRelevant } from '../platforms/wechat/profileStore.js'
+import { getUpcomingGroupEvents, formatEventsForPrompt } from '../platforms/wechat/eventStore.js'
 import { BOT_TOOLS, executeTool } from '../platforms/wechat/botTools.js'
 import { throttledSay } from '../utils/replyQueue.js'
+import { logError } from '../platforms/wechat/errorStore.js'
+
+/**
+ * 给 AI 生成的回复加上标记，方便接收方区分"这是机器人在说话"。
+ * 已带标记或标记为空时不重复添加。
+ */
+function markAiReply(text, marker) {
+  if (!marker) return text
+  if (typeof text !== 'string' || !text.trim()) return text
+  if (text.startsWith(marker.trim())) return text
+  return `${marker}${text}`
+}
+
+// 活动事实防编造护栏：活动信息只能来自数据库/工具，查不到就说没有。
+const ACTIVITY_GUARDRAIL =
+  '[规则: 关于活动/聚会/出行/集合时间地点/车主参与者等事实，只能依据上面"本群近期活动"或工具查询结果回答；若上面显示"无"或查不到，直接说本群暂无相关活动，绝对不要编造任何时间、地点、参与者或细节。]'
 
 /**
  * 处理微信消息。
@@ -12,7 +28,7 @@ import { throttledSay } from '../utils/replyQueue.js'
  */
 export async function defaultMessage(msg, bot) {
 
-  const { botName, autoReplyPrefix, aliasWhiteList, roomWhiteList, commandPrefix, dataDir } =
+  const { botName, autoReplyPrefix, aliasWhiteList, roomWhiteList, commandPrefix, dataDir, privateChatAI, aiReplyMarker } =
     getWechatRuntimeConfig()
 
 
@@ -39,16 +55,16 @@ export async function defaultMessage(msg, bot) {
       if (!isAuthorizedCommand) return
       const result = await handleAdminCommand(content, { roomName, alias: remarkName, name })
       if (result.handled) {
-        if (result.reply) await throttledSay(room || contact, result.reply)
+        if (result.reply) await throttledSay(room || contact, result.reply, room ? [contact] : [])
         return
       }
     }
 
     // 构建上下文前缀（画像 + 群活动）
     const profile = loadProfile(senderKey, dataDir)
-    const profileCtx = formatProfileForPrompt(profile)
     const upcomingEvents = roomName ? getUpcomingGroupEvents(roomName, dataDir) : []
-    const eventsCtx = formatEventsForPrompt(upcomingEvents, dataDir)
+    // 即使没有活动，也显式告诉模型"无"，避免它在信息缺失时凭空编造
+    const eventsCtx = formatEventsForPrompt(upcomingEvents, dataDir) || '[本群近期活动: 无]'
 
     const toolCtx = { roomName, dataDir, senderKey }
     const toolHandler = (toolName, args) => executeTool(toolName, args, toolCtx)
@@ -60,32 +76,39 @@ export async function defaultMessage(msg, bot) {
       console.log('🌸 group:', question)
 
       const ctxParts = [`[群聊: ${roomName} | 发送者: ${senderKey}]`]
-      if (profileCtx) ctxParts.push(profileCtx)
-      if (eventsCtx) ctxParts.push(eventsCtx)
+      // 只有当这句话确实涉及画像里的内容时才注入画像，且按群隔离（只用本群学到的记录）
+      if (profile && isProfileRelevant(question, profile, roomName)) ctxParts.push(formatProfileForPrompt(profile, roomName))
+      ctxParts.push(eventsCtx)
+      ctxParts.push(ACTIVITY_GUARDRAIL)
       const ctx = ctxParts.join('\n') + '\n'
 
       const response = await getDeepseekReplyWithTools(ctx + question, BOT_TOOLS, toolHandler)
-      await throttledSay(room, response)
+      // 群聊里 @ 回提问者，让大家知道在回谁
+      await throttledSay(room, markAiReply(response, aiReplyMarker), [contact])
       extractAndUpdateProfile(senderKey, question, response, roomName, dataDir).catch(() => { })
-      // @机器人的消息也可能是活动邀约，顺手提取
-      extractEventFromMessage(question, senderKey, roomName, dataDir).catch(() => { })
       return
     }
 
     // 私聊
     if (isAlias && !room && content.trimStart().startsWith(`${autoReplyPrefix}`)) {
+      // 私聊默认不启用 AI（PRIVATE_CHAT_AI=true 才开启），管理指令已在上方处理
+      if (!privateChatAI) {
+        console.log('🔕 私聊 AI 已关闭，跳过自动回复:', senderKey)
+        return
+      }
       const question = content.replace(`${autoReplyPrefix}`, '')
       console.log('🌸 private:', question)
 
       const ctxParts = [`[私聊 | 发送者: ${senderKey}]`]
-      if (profileCtx) ctxParts.push(profileCtx)
+      if (profile && isProfileRelevant(question, profile, '私聊')) ctxParts.push(formatProfileForPrompt(profile, '私聊'))
       const ctx = ctxParts.join('\n') + '\n'
 
       const response = await getDeepseekReplyWithTools(ctx + question, BOT_TOOLS, toolHandler)
-      await throttledSay(contact, response)
+      await throttledSay(contact, markAiReply(response, aiReplyMarker))
       extractAndUpdateProfile(senderKey, question, response, null, dataDir).catch(() => { })
     }
   } catch (e) {
     console.error('defaultMessage error:', e)
+    logError('defaultMessage', e, { roomName, senderKey, text: content?.slice(0, 200) }, dataDir)
   }
 }

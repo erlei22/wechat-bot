@@ -3,6 +3,7 @@ import path from 'path'
 import OpenAI from 'openai'
 import dotenv from 'dotenv'
 import { compilePatterns } from './patternConfig.js'
+import { logError } from './errorStore.js'
 
 const env = { ...dotenv.config().parsed, ...process.env }
 
@@ -48,13 +49,87 @@ export function deleteProfile(personKey, dataDir = '.data/wechat') {
 // Prompt injection
 // ---------------------------------------------------------------------------
 
-export function formatProfileForPrompt(profile) {
+// 记录(note)兼容两种格式：旧的纯字符串，新的 { text, group }。
+// group 标记这条记录是在哪个群/私聊学到的，用于按群隔离注入。
+export function noteText(n) {
+  return typeof n === 'string' ? n : (n && n.text) || ''
+}
+function noteGroup(n) {
+  return typeof n === 'string' ? null : (n && n.group) || null
+}
+
+/**
+ * 把画像格式化进提示词。
+ * @param {object} profile
+ * @param {string} [scope]  当前会话所属的群名（私聊传 '私聊'）。
+ *                          传入时只注入该群学到的记录，避免把 A 群的内容带到 B 群；
+ *                          不传则展示全部（用于管理视图）。标签视为通用兴趣，不做群隔离。
+ */
+export function formatProfileForPrompt(profile, scope) {
   if (!profile) return ''
   const parts = []
   if (profile.tags?.length) parts.push(`标签: ${profile.tags.join('、')}`)
-  if (profile.notes?.length) parts.push(`记录: ${profile.notes.slice(-5).join('；')}`)
+  let notes = profile.notes || []
+  // 按群隔离：scope 存在时，只保留来源群匹配的记录（来源未知的旧记录默认不跨群泄露）
+  if (scope) notes = notes.filter((n) => noteGroup(n) === scope)
+  const texts = notes.map(noteText).filter(Boolean).slice(-5)
+  if (texts.length) parts.push(`记录: ${texts.join('；')}`)
   if (!parts.length) return ''
   return `[${profile.name}的画像: ${parts.join(' | ')}]`
+}
+
+// ---------------------------------------------------------------------------
+// Relevance gate
+// 只有当用户当前说的话确实和画像里的数据相关时，才注入画像。
+// 否则不注入——避免"不管说什么都把画像塞进提示词"。
+// ---------------------------------------------------------------------------
+
+const STOPWORDS = new Set(['的', '了', '吗', '呢', '吧', '啊', '是', '我', '你', '他', '她', '它', '们', '个', '在', '有', '去', '和', '与', '也', '都', '很', '就'])
+
+/**
+ * 从一段文本里生成 2~3 字的 n-gram 关键词（中文没有分词，用 n-gram 兜底匹配）。
+ */
+function toNgrams(text, out) {
+  // 先去掉标点和停用字，按非中文/字母数字切成片段
+  const cleaned = String(text).replace(/[\s，。、；：,.;:!?！？（）()【】\[\]"'"'~·…—\-]+/g, ' ')
+  for (const seg of cleaned.split(/\s+/)) {
+    const chars = [...seg].filter((c) => !STOPWORDS.has(c))
+    const s = chars.join('')
+    if (s.length < 2) continue
+    if (s.length <= 4) out.add(s.toLowerCase())
+    for (let n = 2; n <= 3; n++) {
+      for (let i = 0; i + n <= s.length; i++) out.add(s.slice(i, i + n).toLowerCase())
+    }
+  }
+}
+
+/**
+ * 从画像中抽取可用于匹配的关键词：标签 + 记录的 n-gram。
+ * @param {string} [scope] 传入群名时只用该群学到的记录做匹配（标签始终参与）。
+ */
+function profileKeywords(profile, scope) {
+  const keys = new Set()
+  for (const tag of profile.tags || []) {
+    const t = String(tag).trim().toLowerCase()
+    if (t.length >= 2 && !STOPWORDS.has(t)) keys.add(t)
+    toNgrams(tag, keys)
+  }
+  const notes = scope ? (profile.notes || []).filter((n) => noteGroup(n) === scope) : profile.notes || []
+  for (const note of notes) toNgrams(noteText(note), keys)
+  return [...keys]
+}
+
+/**
+ * 判断当前消息是否和画像相关。
+ * @param {string} text    当前消息
+ * @param {object} profile 画像
+ * @param {string} [scope] 当前群名（私聊传 '私聊'）。按群隔离时只用该群的记录判断相关性。
+ * @returns {boolean} 相关才返回 true，调用方据此决定是否注入画像。
+ */
+export function isProfileRelevant(text, profile, scope) {
+  if (!text || !profile) return false
+  const haystack = text.toLowerCase()
+  return profileKeywords(profile, scope).some((k) => haystack.includes(k))
 }
 
 // ---------------------------------------------------------------------------
@@ -100,7 +175,7 @@ export async function extractAndUpdateProfile(personKey, question, answer, roomN
 
   const existing = loadProfile(personKey, dataDir)
   const existingTags = existing?.tags || []
-  const existingNotes = existing?.notes || []
+  const existingNotes = (existing?.notes || []).map(noteText)
 
   const openai = new OpenAI({ apiKey, baseURL })
 
@@ -174,7 +249,9 @@ export async function extractAndUpdateProfile(personKey, question, answer, roomN
       profile.tags = [...new Set([...profile.tags, ...newTags])].slice(0, 15)
     }
     if (newNotes.length) {
-      profile.notes = [...profile.notes, ...newNotes].slice(-20)
+      const scope = roomName || '私聊'
+      const scoped = newNotes.map((t) => ({ text: t, group: scope }))
+      profile.notes = [...profile.notes, ...scoped].slice(-20)
     }
 
     profile.lastSeen = new Date().toISOString()
@@ -184,6 +261,7 @@ export async function extractAndUpdateProfile(personKey, question, answer, roomN
     console.log(`📝 画像已更新: ${personKey}`)
   } catch (e) {
     console.error('profileStore 提取失败:', e.message)
+    logError('extractAndUpdateProfile', e, { personKey, roomName, question: question?.slice(0, 200) }, dataDir)
   }
 }
 
@@ -217,7 +295,7 @@ export async function extractFromPassiveMessage(senderKey, text, roomName, dataD
 
   const existing = loadProfile(senderKey, dataDir)
   const existingTags = existing?.tags || []
-  const existingNotes = existing?.notes || []
+  const existingNotes = (existing?.notes || []).map(noteText)
 
   const openai = new OpenAI({ apiKey, baseURL })
 
@@ -263,12 +341,16 @@ ${senderKey}说: ${text}
 
     if (roomName && !profile.groups.includes(roomName)) profile.groups.push(roomName)
     if (newTags.length) profile.tags = [...new Set([...profile.tags, ...newTags])].slice(0, 15)
-    if (newNotes.length) profile.notes = [...profile.notes, ...newNotes].slice(-20)
+    if (newNotes.length) {
+      const scope = roomName || '私聊'
+      profile.notes = [...profile.notes, ...newNotes.map((t) => ({ text: t, group: scope }))].slice(-20)
+    }
     profile.lastSeen = new Date().toISOString()
 
     saveProfile(senderKey, profile, dataDir)
     console.log(`👁️ 被动画像更新: ${senderKey} — "${text.slice(0, 30)}"`)
   } catch (e) {
     console.error('extractFromPassiveMessage 失败:', e.message)
+    logError('extractFromPassiveMessage', e, { senderKey, roomName, text: text?.slice(0, 200) }, dataDir)
   }
 }

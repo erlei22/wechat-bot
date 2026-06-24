@@ -1,4 +1,4 @@
-import { loadGroupEvents, saveGroupEvents, getUpcomingGroupEvents, formatEventsForPrompt } from './eventStore.js'
+import { getUpcomingGroupEvents, formatEventsForPrompt } from './eventStore.js'
 import { loadProfile, formatProfileForPrompt } from './profileStore.js'
 import { saveFeedback } from './feedbackStore.js'
 
@@ -13,36 +13,6 @@ export const BOT_TOOLS = [
       name: 'get_upcoming_events',
       description: '查询本群的近期活动列表，包括时间、地点、参与者、车主等信息',
       parameters: { type: 'object', properties: {}, required: [] },
-    },
-  },
-  {
-    type: 'function',
-    function: {
-      name: 'join_event',
-      description: '将某人加入某个活动的参与者列表',
-      parameters: {
-        type: 'object',
-        properties: {
-          event_id: { type: 'string', description: '活动 ID' },
-          participant_name: { type: 'string', description: '要加入的人的昵称' },
-        },
-        required: ['event_id', 'participant_name'],
-      },
-    },
-  },
-  {
-    type: 'function',
-    function: {
-      name: 'leave_event',
-      description: '将某人从活动参与者列表中移除',
-      parameters: {
-        type: 'object',
-        properties: {
-          event_id: { type: 'string', description: '活动 ID' },
-          participant_name: { type: 'string', description: '要退出的人的昵称' },
-        },
-        required: ['event_id', 'participant_name'],
-      },
     },
   },
   {
@@ -95,36 +65,12 @@ export async function executeTool(toolName, args, ctx) {
       return formatEventsForPrompt(events, dataDir)
     }
 
-    case 'join_event': {
-      const events = loadGroupEvents(roomName, dataDir)
-      const idx = events.findIndex((e) => e.id === args.event_id)
-      if (idx < 0) return `找不到活动 ID: ${args.event_id}`
-      if (!events[idx].participants) events[idx].participants = []
-      if (events[idx].participants.includes(args.participant_name)) {
-        return `${args.participant_name} 已经在「${events[idx].title}」的名单里了`
-      }
-      events[idx].participants.push(args.participant_name)
-      events[idx].updatedAt = new Date().toISOString()
-      saveGroupEvents(roomName, events, dataDir)
-      return `已将 ${args.participant_name} 加入「${events[idx].title}」。当前参与者：${events[idx].participants.join('、')}`
-    }
-
-    case 'leave_event': {
-      const events = loadGroupEvents(roomName, dataDir)
-      const idx = events.findIndex((e) => e.id === args.event_id)
-      if (idx < 0) return `找不到活动 ID: ${args.event_id}`
-      const before = events[idx].participants || []
-      events[idx].participants = before.filter((p) => p !== args.participant_name)
-      events[idx].updatedAt = new Date().toISOString()
-      saveGroupEvents(roomName, events, dataDir)
-      const remaining = events[idx].participants.join('、') || '（空）'
-      return `已将 ${args.participant_name} 从「${events[idx].title}」移除。剩余参与者：${remaining}`
-    }
-
     case 'get_person_profile': {
       const profile = loadProfile(args.name, dataDir)
       if (!profile) return `还没有关于 ${args.name} 的记录`
-      return formatProfileForPrompt(profile) || `${args.name} 的记录还不够丰富`
+      // 按群隔离：群里查询只返回本群学到的记录，私聊用 '私聊' 作用域
+      const scope = roomName || '私聊'
+      return formatProfileForPrompt(profile, scope) || `${args.name} 的记录还不够丰富`
     }
 
     case 'submit_feedback': {

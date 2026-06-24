@@ -19,14 +19,19 @@ function sleep(ms) {
 
 /**
  * 将消息加入发送队列，自动限速。
- * @param {object} target  wechaty Room 或 Contact 对象
- * @param {string} text    要发送的文字
+ * @param {object} target       wechaty Room 或 Contact 对象
+ * @param {string} text         要发送的文字
+ * @param {Array}  mentionList  群聊里要 @ 的联系人（Contact 对象），私聊忽略
  */
-export function throttledSay(target, text) {
+export function throttledSay(target, text, mentionList = []) {
   queue = queue.then(async () => {
     const delay = MIN_DELAY_MS + Math.random() * MAX_JITTER_MS
     await sleep(delay)
-    await target.say(text)
+    if (Array.isArray(mentionList) && mentionList.length) {
+      await target.say(text, ...mentionList)
+    } else {
+      await target.say(text)
+    }
   })
   return queue
 }

@@ -2,6 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import OpenAI from 'openai'
 import dotenv from 'dotenv'
+import { logError } from './errorStore.js'
 
 const env = { ...dotenv.config().parsed, ...process.env }
 
@@ -138,7 +139,7 @@ export function formatEventsForPrompt(events, dataDir = '.data/wechat') {
 const extractionCooldown = new Map()
 const EXTRACTION_COOLDOWN_MS = 2 * 60 * 1000 // 2 minutes per room
 
-function mergeEvent(existing, updates) {
+export function mergeEvent(existing, updates) {
   const merged = { ...existing }
   for (const [key, val] of Object.entries(updates)) {
     if (val === null || val === undefined || val === '') continue
@@ -263,5 +264,6 @@ ${existing.length ? existing.map((e) => `- id:${e.id} | ${e.title} | ${e.date ||
     console.log(`📅 新活动记录 [${roomName}]: ${newEvent.title} (${newEvent.date || '日期待定'})`)
   } catch (e) {
     console.error('extractEventFromMessage 失败:', e.message)
+    logError('extractEventFromMessage', e, { roomName, senderKey, text: text?.slice(0, 200) }, dataDir)
   }
 }

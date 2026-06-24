@@ -4,7 +4,8 @@ import { defaultMessage } from '../../wechaty/sendMessage.js'
 import { captureWechatMessage } from './messageStore.js'
 import { getWechatRuntimeConfig } from '../../config/env.js'
 import { extractFromPassiveMessage } from './profileStore.js'
-import { extractEventFromMessage } from './eventStore.js'
+import { processEventMessage } from './eventLifecycle.js'
+import { throttledSay } from '../../utils/replyQueue.js'
 
 function onScan(qrcode, status) {
   if (status === ScanStatus.Waiting || status === ScanStatus.Timeout) {
@@ -79,8 +80,15 @@ export function createWechatBot() {
         if (config.aliasWhiteList.includes(talkerAlias) || config.aliasWhiteList.includes(talkerName)) {
           extractFromPassiveMessage(senderKey, message.text(), roomName, config.dataDir).catch(() => { })
         }
-        // 活动提取对群里所有人开放（不限白名单），但按群隔离
-        extractEventFromMessage(message.text(), senderKey, roomName, config.dataDir).catch(() => { })
+        // 活动生命周期：创建二次确认 / 仅发起者可改删 / 报名引导找发起者。
+        // 对群里所有人开放（不限白名单），按群隔离。机器人需要回复时发到群里并 @ 发言人。
+        processEventMessage({ text: message.text(), senderKey, roomName, dataDir: config.dataDir })
+          .then((reply) => {
+            if (!reply) return
+            const marked = config.aiReplyMarker ? `${config.aiReplyMarker}${reply}` : reply
+            return throttledSay(room, marked, [talker])
+          })
+          .catch(() => { })
       }
     }
   })
