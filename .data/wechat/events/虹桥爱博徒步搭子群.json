@@ -1,0 +1,54 @@
+[
+  {
+    "id": "1782358045856",
+    "title": "哈皮熊聚会",
+    "type": "聚会",
+    "date": "2026-06-26",
+    "time": "8:00",
+    "location": "哈皮熊",
+    "initiator": "逆行",
+    "participants": [
+      "逆行"
+    ],
+    "notes": "",
+    "room": "虹桥爱博徒步搭子群",
+    "status": "upcoming",
+    "createdAt": "2026-06-25T03:27:25.856Z",
+    "updatedAt": "2026-06-25T03:28:42.565Z",
+    "meetingPoint": "哈皮熊"
+  },
+  {
+    "id": "1782361313098",
+    "title": "花鸟岛之行",
+    "type": "其他",
+    "date": "",
+    "time": "",
+    "location": "花鸟岛",
+    "initiator": "小贝",
+    "participants": [
+      "小贝"
+    ],
+    "notes": "",
+    "room": "虹桥爱博徒步搭子群",
+    "status": "upcoming",
+    "createdAt": "2026-06-25T04:21:53.098Z",
+    "updatedAt": "2026-06-25T04:21:53.098Z"
+  },
+  {
+    "id": "1782366871413",
+    "title": "杏梅尖徒步",
+    "type": "徒步",
+    "date": "2026-06-27",
+    "time": "",
+    "location": "杏梅尖",
+    "initiator": "杨杨杨🐏",
+    "participants": [
+      "杨杨杨🐏"
+    ],
+    "notes": "1等n。约得到人就一起",
+    "room": "虹桥爱博徒步搭子群",
+    "status": "upcoming",
+    "createdAt": "2026-06-25T05:54:31.413Z",
+    "updatedAt": "2026-06-25T05:54:31.413Z"
+  }
+]

@@ -37,7 +37,6 @@ const DATA_DIR = '.data/wechat'
 
 const DB_ALIASES = {
   messages: path.join(DATA_DIR, 'messages.db'),
-  errors:   path.join(DATA_DIR, 'errors.db'),
   feedback: path.join(DATA_DIR, 'feedback.db'),
 }
 

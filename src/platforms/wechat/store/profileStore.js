@@ -5,6 +5,7 @@ import dotenv from 'dotenv'
 import { compilePatterns } from '../lifecycle/patternConfig.js'
 import { logError } from './errorStore.js'
 import { loadWechatMessages } from './messageStore.js'
+import { safeJsonParse } from '../../../utils/json.js'
 
 const env = { ...dotenv.config().parsed, ...process.env }
 
@@ -565,10 +566,11 @@ ${personKey}说: ${question}
       model,
       messages: [{ role: 'user', content: prompt }],
       response_format: { type: 'json_object' },
-      max_tokens: 300,
+      max_tokens: 700,
     })
 
-    const extracted = JSON.parse(res.choices[0].message.content || '{}')
+    const extracted = safeJsonParse(res.choices[0].message.content)
+    if (!extracted) return // 解析失败（多为截断），优雅跳过，不刷错误日志
 
     // LLM 判定为操纵尝试 — 整条丢弃
     if (extracted.isManipulation) {
@@ -649,10 +651,11 @@ ${transcript || text}
       model,
       messages: [{ role: 'user', content: prompt }],
       response_format: { type: 'json_object' },
-      max_tokens: 300,
+      max_tokens: 700,
     })
 
-    const extracted = JSON.parse(res.choices[0].message.content || '{}')
+    const extracted = safeJsonParse(res.choices[0].message.content)
+    if (!extracted) return // 解析失败（多为截断），优雅跳过
     if (extracted.isManipulation) return
 
     const profile = existing || createEmptyProfile(senderKey)

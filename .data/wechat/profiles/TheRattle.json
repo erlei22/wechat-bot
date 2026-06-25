@@ -1,0 +1,33 @@
+{
+  "name": "TheRattle",
+  "gender": "unknown",
+  "ageRange": "",
+  "birthday": "",
+  "zodiac": "",
+  "mbti": "",
+  "occupation": "",
+  "company": "",
+  "city": "",
+  "district": "",
+  "diet": "",
+  "sports": [],
+  "schedule": "",
+  "hobbies": [
+    "风水",
+    "海鲜/出海",
+    "电脑硬件"
+  ],
+  "hasCar": null,
+  "canDrive": null,
+  "carInfo": "",
+  "personality": "",
+  "closeFriends": [],
+  "groups": [
+    "虹桥爱博徒步搭子群"
+  ],
+  "tags": [],
+  "notes": [],
+  "messageCount": 0,
+  "firstSeen": "2026-06-25T06:21:10.840Z",
+  "lastSeen": "2026-06-25T06:21:10.842Z"
+}

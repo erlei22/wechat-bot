@@ -1,6 +1,8 @@
 {
   "name": "一趟",
-  "groups": [],
+  "groups": [
+    "徒步小分队"
+  ],
   "tags": [
     "嗑CP专业户",
     "吃瓜群众"
@@ -23,7 +25,7 @@
   ],
   "messageCount": 4,
   "firstSeen": "2026-06-23T00:00:00.000Z",
-  "lastSeen": "2026-06-23T14:10:44.621Z",
+  "lastSeen": "2026-06-25T04:47:51.244Z",
   "gender": "unknown",
   "ageRange": "",
   "birthday": "",
@@ -31,12 +33,14 @@
   "mbti": "",
   "occupation": "",
   "company": "",
-  "city": "",
-  "district": "",
-  "diet": "",
+  "city": "上海",
+  "district": "闵行区",
+  "diet": "韩式料理",
   "sports": [],
   "schedule": "",
-  "hobbies": [],
+  "hobbies": [
+    "美食"
+  ],
   "hasCar": null,
   "canDrive": null,
   "carInfo": "",

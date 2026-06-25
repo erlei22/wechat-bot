@@ -1,7 +1,8 @@
 {
   "name": "麻薯",
   "groups": [
-    "徒步小分队"
+    "徒步小分队",
+    "虹桥野生食堂"
   ],
   "tags": [
     "新手司机",
@@ -38,11 +39,18 @@
       "count": 1,
       "firstSeen": "2026-06-23T00:00:00.000Z",
       "lastSeen": "2026-06-23T14:08:08.610Z"
+    },
+    {
+      "text": "有车，会开车，晚上有洗车+充电计划",
+      "group": "虹桥野生食堂",
+      "count": 1,
+      "firstSeen": "2026-06-25T06:32:59.064Z",
+      "lastSeen": "2026-06-25T06:32:59.064Z"
     }
   ],
   "messageCount": 1,
   "firstSeen": "2026-06-23T00:00:00.000Z",
-  "lastSeen": "2026-06-23T14:08:08.610Z",
+  "lastSeen": "2026-06-25T06:32:59.064Z",
   "gender": "unknown",
   "ageRange": "",
   "birthday": "",
@@ -52,12 +60,14 @@
   "company": "",
   "city": "",
   "district": "",
-  "diet": "",
+  "diet": "芝士",
   "sports": [],
   "schedule": "",
-  "hobbies": [],
-  "hasCar": null,
-  "canDrive": null,
+  "hobbies": [
+    "拍照（出片）"
+  ],
+  "hasCar": true,
+  "canDrive": true,
   "carInfo": "",
   "personality": "",
   "closeFriends": []

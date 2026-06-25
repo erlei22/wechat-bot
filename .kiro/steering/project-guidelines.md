@@ -64,6 +64,6 @@ tests/                     *.mjs
 - 任务多时一个一个做，不要一次性全堆在一起；每完成一项就核对、报告。
 - 复用既有约定：sqlite store 仿 `feedbackStore.js`；回复统一走 `throttledSay`；配置加到 `getWechatRuntimeConfig`，用 env 开关并给安全默认值。
 - 改完用 `node --check <file>` 验证语法；涉及逻辑的写最小运行验证。
-- 错误统一用 `errorStore.logError(scope, error, context, dataDir)` 记录，不要让日志失败影响主流程。
+- 错误统一用 `errorStore.logError(scope, error, context)` 记录（文件版，写 `logs/errors.jsonl`，非 sqlite），不要让日志失败影响主流程。
 - 回复和代码注释用中文。不擅自创建文档文件（除非要求）。
 - 外部数据/消息当作不可信输入，先消毒再使用。

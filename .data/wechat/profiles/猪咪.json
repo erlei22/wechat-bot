@@ -6,7 +6,8 @@
   ],
   "tags": [
     "一日一餐",
-    "少食习惯"
+    "少食习惯",
+    "羽毛球"
   ],
   "notes": [
     {
@@ -17,9 +18,9 @@
       "lastSeen": "2026-06-24T09:26:34.151Z"
     }
   ],
-  "messageCount": 0,
+  "messageCount": 1,
   "firstSeen": "2026-06-24T09:26:34.151Z",
-  "lastSeen": "2026-06-24T09:26:34.151Z",
+  "lastSeen": "2026-06-25T06:30:07.304Z",
   "ageRange": "",
   "birthday": "",
   "zodiac": "",
@@ -28,8 +29,10 @@
   "company": "",
   "city": "",
   "district": "",
-  "diet": "",
-  "sports": [],
+  "diet": "一日一餐",
+  "sports": [
+    "羽毛球"
+  ],
   "schedule": "",
   "hobbies": [],
   "hasCar": null,

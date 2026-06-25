@@ -1,0 +1,14 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "日常巡检 Daily Maintenance",
+      "trigger": "UserPromptSubmit",
+      "description": "用户发\"巡检/日常维护/xunjian\"时，注入日常巡检流程指令，让 agent 自动查bug→看今天聊天→优化活动/画像/流程→给简报。其它消息静默不干扰。",
+      "action": {
+        "type": "command",
+        "command": "in=$(cat); printf '%s' \"$in\" | grep -qE '巡检|日常维护|日常运维|xunjian' && printf '【日常巡检已触发】请读取并严格按 .kiro/steering/daily-maintenance.md 的流程执行：1) tail logs/errors.jsonl 查bug并修根因；2) 用 scripts/db.mjs 查各白名单群今天的聊天；3) 检查 .data/wechat/events 活动流程；4) 巡查并更新画像、清理脏数据；5) 实施小步优化；6) 最后给一份中文简报。每步用工具实查，破坏性操作先确认。' || true"
+      }
+    }
+  ]
+}

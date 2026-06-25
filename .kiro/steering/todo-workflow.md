@@ -40,3 +40,9 @@
 - 分析模块自测：`npm run test:analysis`
 - 消息测试：`npm run test`
 - 格式化：`npm run format`（提交时 husky + lint-staged 会自动 prettier）
+
+## 日常巡检（一键运维）
+
+用户发「巡检」（或在 Agent Hooks 面板点 daily-maintenance）→ hook 注入指令 → 按
+`.kiro/steering/daily-maintenance.md` 的流程自驱执行：查 bug（`logs/errors.jsonl`）→ 看今天各群聊天（`scripts/db.mjs`）→ 活动流程 → 画像更新与脏数据巡查 → 小步优化 → 中文简报。
+触发词：巡检 / 日常维护 / 日常运维 / xunjian。

@@ -1,0 +1,32 @@
+{
+  "name": "小乔大王",
+  "gender": "unknown",
+  "ageRange": "",
+  "birthday": "",
+  "zodiac": "",
+  "mbti": "",
+  "occupation": "",
+  "company": "",
+  "city": "",
+  "district": "",
+  "diet": "",
+  "sports": [],
+  "schedule": "",
+  "hobbies": [
+    "旅游",
+    "美食"
+  ],
+  "hasCar": null,
+  "canDrive": null,
+  "carInfo": "",
+  "personality": "",
+  "closeFriends": [],
+  "groups": [
+    "虹桥爱博徒步搭子群"
+  ],
+  "tags": [],
+  "notes": [],
+  "messageCount": 0,
+  "firstSeen": "2026-06-25T05:31:11.046Z",
+  "lastSeen": "2026-06-25T05:31:11.047Z"
+}

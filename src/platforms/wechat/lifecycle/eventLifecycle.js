@@ -9,6 +9,7 @@ import {
   mergeEvent,
 } from '../store/eventStore.js'
 import { logError } from '../store/errorStore.js'
+import { safeJsonParse } from '../../../utils/json.js'
 
 const env = { ...dotenv.config().parsed, ...process.env }
 
@@ -161,21 +162,27 @@ export function applyEventIntent(intent, { senderKey, roomName, dataDir }) {
     }
 
     case 'update': {
-      if (!intent.targetId || !intent.event) return null
+      if (!intent.targetId) return null
       const events = loadGroupEvents(roomName, dataDir)
       const idx = events.findIndex((ev) => ev.id === intent.targetId)
       if (idx < 0) return null
       const ev = events[idx]
-      // 权限：只有发起者能改（旧数据无 initiator 时放行，避免破坏历史）
+      // 权限：只有发起者能改（含增减名单）。旧数据无 initiator 时放行。
       if (ev.initiator && ev.initiator !== senderKey) {
-        return `「${ev.title}」是 ${ev.initiator} 发起的，只有 TA 能修改哦～`
+        return `「${ev.title}」是 ${ev.initiator} 发起的，只有 TA 能改哦～`
       }
-      events[idx] = mergeEvent(ev, intent.event)
+      if (intent.event) events[idx] = mergeEvent(ev, intent.event) // 含 participants 追加
+      // 移除参与者（发起者把谁踢出名单）
+      const remove = Array.isArray(intent.removeParticipants) ? intent.removeParticipants : []
+      if (remove.length) {
+        events[idx].participants = (events[idx].participants || []).filter((p) => !remove.includes(p))
+      }
       events[idx].updatedAt = now
       saveGroupEvents(roomName, events, dataDir)
-      const updated = events[idx]
-      const info = [updated.date, updated.time, updated.location, updated.meetingPoint].filter(Boolean).join(' / ')
-      return `✅ 已更新「${updated.title}」${info ? `\n当前信息：${info}` : ''}`
+      const u = events[idx]
+      const info = [u.date, u.time, u.location].filter(Boolean).join(' / ')
+      const roster = u.participants?.length ? `\n名单（${u.participants.length}人）：${u.participants.join('、')}` : ''
+      return `✅ 已更新「${u.title}」${info ? `\n${info}` : ''}${roster}`
     }
 
     case 'delete': {
@@ -225,6 +232,24 @@ export function applyEventIntent(intent, { senderKey, roomName, dataDir }) {
       return `已把你从「${events[idx].title}」的名单里移除了`
     }
 
+    case 'query': {
+      // 有人咨询近期活动 → 主动播报（只有真有活动才插话，避免噪音）
+      const events = getUpcomingGroupEvents(roomName, dataDir)
+      if (!events.length) return null
+      const lines = ['📋 本群近期活动：']
+      for (const e of events.slice(0, 5)) {
+        const when = [e.date, e.time].filter(Boolean).join(' ')
+        const where = e.location ? ` @${e.location}` : ''
+        lines.push(`• ${e.title}${when || where ? `（${[when, where.trim()].filter(Boolean).join(' ')}）` : ''}`)
+        const meta = []
+        if (e.initiator) meta.push(`发起人：${e.initiator}`)
+        if (e.participants?.length) meta.push(`已报名 ${e.participants.length} 人：${e.participants.join('、')}`)
+        if (meta.length) lines.push(`   ${meta.join('　')}`)
+      }
+      lines.push('想参加的直接找发起人报名哈～')
+      return lines.join('\n')
+    }
+
     default:
       return null
   }
@@ -260,10 +285,11 @@ ${existing.length ? existing.map((e) => `- id:${e.id} | ${e.title} | ${e.date ||
 
 判断 action（口语化也要识别）：
 - "create"：发起/邀约新活动，如「周六爬山有人去吗」「晚上去喝一杯」「一起吃饭」。
-- "update"：发起者补充或修改已有活动的时间/地点/集合/备注，需给出 targetId。
+- "update"：发起者补充/修改已有活动的时间/地点/集合/备注，或增减参与者（"把麻薯加上"/"大林也去"→放进 event.participants；"去掉小白"/"麻薯不去了"→放进 removeParticipants），需给出 targetId。
 - "join"：有人想报名加入，如「算我一个」「我要去」「带我」，需给出 targetId。
 - "leave"：有人想退出，如「我去不了了」，需给出 targetId。
 - "delete"：要取消/删除某个已有活动，需给出 targetId。
+- "query"：有人在打听近期活动/有什么安排/去哪玩/周末干嘛/今晚有啥，想知道群里有什么活动。
 - "none"：纯聊天、吐槽、提问，与活动无关。
 
 返回 JSON：
@@ -272,18 +298,21 @@ ${existing.length ? existing.map((e) => `- id:${e.id} | ${e.title} | ${e.date ||
   "targetId": "",
   "event": {
     "title": "", "type": "", "date": "", "time": "",
-    "location": "", "meetingPoint": "", "notes": ""
-  }
+    "location": "", "notes": "", "participants": []
+  },
+  "removeParticipants": []
 }
-注意：日期口语（今晚/今天/周六/下周）要换算成 YYYY-MM-DD。`
+注意：
+- 日期口语（今晚/今天/周六/下周）要换算成 YYYY-MM-DD。
+- event.participants 只在 update 且发起者明确要加人时填；create 不用填（发起者自动入列）。`
 
   const res = await openai.chat.completions.create({
     model,
     messages: [{ role: 'user', content: prompt }],
     response_format: { type: 'json_object' },
-    max_tokens: 400,
+    max_tokens: 500,
   })
-  return JSON.parse(res.choices[0].message.content || '{}')
+  return safeJsonParse(res.choices[0].message.content) || { action: 'none' }
 }
 
 // ---------------------------------------------------------------------------

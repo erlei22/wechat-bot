@@ -288,13 +288,14 @@ export async function handleAdminCommand(content, context = {}) {
     const sub = tokens[1]
 
     if (sub === '清空' || sub === 'clear') {
-      const n = clearErrors(config.dataDir)
+      const n = clearErrors()
       return { handled: true, reply: `🗑️ 已清空 ${n} 条错误日志` }
     }
 
-    const scope = sub && sub !== '全部' && sub !== 'all' ? sub : null
-    const total = countErrors({ scope }, config.dataDir)
-    const rows = listErrors({ scope, limit: 10 }, config.dataDir)
+    // /错误 [scope] — 看最近错误，可按模块名过滤
+    const scope = sub || null
+    const total = countErrors({ scope })
+    const rows = listErrors({ scope, limit: 10 })
     const header = `🐞 错误日志 (${total} 条${scope ? ` · ${scope}` : ''})：\n`
     return { handled: true, reply: header + formatErrorList(rows) }
   }
