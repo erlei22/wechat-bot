@@ -19,6 +19,20 @@ function markAiReply(text, marker) {
 const ACTIVITY_GUARDRAIL =
   '[规则: 关于活动/聚会/出行/集合时间地点/车主参与者等事实，只能依据上面"本群近期活动"或工具查询结果回答；若上面显示"无"或查不到，直接说本群暂无相关活动，绝对不要编造任何时间、地点、参与者或细节。]'
 
+// 任务类意图的语气提示：命中则收敛成简洁工具语气，不捧场不绕弯
+const TOOL_TONE = '[当前是查询/办事，请直接给结果，简洁利落，不用捧场和寒暄，给完可一句轻松收尾。]'
+const TASK_HINTS = [
+  '天气', '气温', '下雨', '几度', '温度', '紫外线', '空气',
+  '日历', '农历', '阳历', '节气', '黄历', '几号', '星期几', '假', '调休', '工作日',
+  '活动', '几点', '集合', '在哪', '报名', '名单', '车主', '谁去', '谁来',
+  '统计', '分析', '搜', '查一下', '查查', '搜索',
+]
+/** 廉价判断是否任务类意图（代码预筛，命中走简洁语气，否则默认温柔捧场）。 */
+function isTaskIntent(text) {
+  if (!text) return false
+  return TASK_HINTS.some((k) => text.includes(k))
+}
+
 export async function defaultMessage(msg, bot) {
   const {
     botName, autoReplyPrefix, aliasWhiteList, roomWhiteList,
@@ -110,9 +124,11 @@ export async function defaultMessage(msg, bot) {
       const ctx = ctxParts.join('\n') + '\n'
 
       const history = getHistory(roomName, multiRoundTurns)
-      logger.debug('[AI →]', { ctxLen: ctx.length, historyTurns: history.length })
+      // 任务意图 → 叠加简洁工具语气；闲聊 → 走默认温柔捧场人设
+      const systemAppend = isTaskIntent(question) ? `${ACTIVITY_GUARDRAIL}\n${TOOL_TONE}` : ACTIVITY_GUARDRAIL
+      logger.debug('[AI →]', { ctxLen: ctx.length, historyTurns: history.length, tone: isTaskIntent(question) ? 'tool' : 'chat' })
 
-      const response = await getDeepseekReplyWithTools(ctx + question, BOT_TOOLS, toolHandler, ACTIVITY_GUARDRAIL, history)
+      const response = await getDeepseekReplyWithTools(ctx + question, BOT_TOOLS, toolHandler, systemAppend, history)
       logger.info('[REPLY ←]', { room: roomName, preview: response.slice(0, 60) })
 
       await throttledSay(room, markAiReply(response, aiReplyMarker), [contact])

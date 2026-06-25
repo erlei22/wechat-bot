@@ -13,7 +13,10 @@
   "notes": [
     {
       "text": "用户表示要吃辣味的，偏好辣味食物。",
-      "group": null
+      "group": null,
+      "count": 1,
+      "firstSeen": "2026-06-23T11:34:54.852Z",
+      "lastSeen": "2026-06-23T13:11:19.482Z"
     }
   ],
   "messageCount": 3,

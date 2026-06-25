@@ -10,7 +10,10 @@
   "notes": [
     {
       "text": "认为标点符号和表情过于规整的发言可能是虚假的。",
-      "group": null
+      "group": null,
+      "count": 1,
+      "firstSeen": "2026-06-23T12:51:35.428Z",
+      "lastSeen": "2026-06-23T12:51:35.428Z"
     }
   ],
   "messageCount": 0,

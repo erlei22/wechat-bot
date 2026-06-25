@@ -70,13 +70,22 @@ for (const file of files) {
 
   const changes = []
 
-  // 1. notes 格式升级：string → {text, group: null}
+  // 1. notes 格式升级：string → {text, group, count, firstSeen, lastSeen}
   if (Array.isArray(profile.notes)) {
-    const hasOld = profile.notes.some(n => typeof n === 'string')
-    if (hasOld) {
-      profile.notes = profile.notes.map(n => typeof n === 'string' ? { text: n, group: null } : n)
-      changes.push(`notes: 字符串 → {text, group}`)
-    }
+    let touched = false
+    profile.notes = profile.notes.map((n) => {
+      if (typeof n === 'string') {
+        touched = true
+        return { text: n, group: null, count: 1, firstSeen: profile.firstSeen || new Date().toISOString(), lastSeen: profile.lastSeen || new Date().toISOString() }
+      }
+      // 已是对象但缺 count/时间戳 → 补
+      if (n && typeof n === 'object' && n.count === undefined) {
+        touched = true
+        return { text: n.text, group: n.group ?? null, count: 1, firstSeen: n.firstSeen || profile.firstSeen || new Date().toISOString(), lastSeen: n.lastSeen || profile.lastSeen || new Date().toISOString() }
+      }
+      return n
+    })
+    if (touched) changes.push('notes: 补 count/时间戳')
   }
 
   // 2. 补齐缺失字段

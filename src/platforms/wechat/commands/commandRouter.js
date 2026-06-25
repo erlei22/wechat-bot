@@ -2,7 +2,7 @@ import { analyzeWechatMessages } from '../../../analysis/wechatAnalyzer.js'
 import { getWechatRuntimeConfig } from '../../../config/env.js'
 import { runOpenCli } from '../../cli/opencli.js'
 import { loadPatternConfig, addPattern, removePattern } from '../lifecycle/patternConfig.js'
-import { loadProfile, noteText } from '../store/profileStore.js'
+import { loadProfile, noteText, deleteProfile, resetProfileField } from '../store/profileStore.js'
 import { loadEventConfig, addEventType, getUpcomingGroupEvents, formatEventsForPrompt } from '../store/eventStore.js'
 import { listFeedback, countFeedback, updateFeedbackStatus, formatFeedbackList } from '../store/feedbackStore.js'
 import { listErrors, countErrors, clearErrors, formatErrorList, logError } from '../store/errorStore.js'
@@ -78,8 +78,28 @@ export async function handleAdminCommand(content, context = {}) {
 
   // ── /画像 ─────────────────────────────────────────────────────────────────
   if (command === '画像') {
+    const sub = tokens[1]
+
+    // /画像 重置 <昵称> — 清空某人画像（应对投毒）
+    if (sub === '重置' || sub === 'reset') {
+      const who = tokens.slice(2).join(' ').trim()
+      if (!who) return { handled: true, reply: '用法：/画像 重置 <昵称>' }
+      if (!loadProfile(who, config.dataDir)) return { handled: true, reply: `没有 ${who} 的画像` }
+      deleteProfile(who, config.dataDir)
+      return { handled: true, reply: `🗑️ 已清空 ${who} 的画像` }
+    }
+
+    // /画像 删 <昵称> <字段> — 清除被污染的某个字段
+    if (sub === '删' || sub === 'del') {
+      const who = tokens[2]
+      const field = tokens[3]
+      if (!who || !field) return { handled: true, reply: '用法：/画像 删 <昵称> <字段>\n字段如：性格、职业、标签、记录、城市…' }
+      const ok = resetProfileField(who, field, config.dataDir)
+      return { handled: true, reply: ok ? `✅ 已清除 ${who} 的「${field}」` : `没找到 ${who} 的画像或字段「${field}」` }
+    }
+
     const target = tokens.slice(1).join(' ').trim()
-    if (!target) return { handled: true, reply: '用法：/画像 <昵称>' }
+    if (!target) return { handled: true, reply: '用法：/画像 <昵称>　|　/画像 重置 <昵称>　|　/画像 删 <昵称> <字段>' }
     const profile = loadProfile(target, config.dataDir)
     if (!profile) return { handled: true, reply: `还没有 ${target} 的画像，多聊几句就有了` }
     const genderLabel = { male: '男 ♂', female: '女 ♀', unknown: '—' }[profile.gender || 'unknown'] ?? '—'
@@ -103,12 +123,20 @@ export async function handleAdminCommand(content, context = {}) {
       ['生日', profile.birthday],
     ].filter(([, v]) => v && v !== '—')
 
+    // 记录带置信度标记：✓ 已确认(≥2次)，? 待定(1次)
+    const noteLines = (profile.notes || []).slice(-8).map((n) => {
+      const cnt = typeof n === 'object' && n?.count ? n.count : 1
+      const badge = cnt >= 2 ? `✓${cnt}` : '?'
+      const grp = typeof n === 'object' && n?.group ? `（${n.group}）` : ''
+      return `  • [${badge}] ${noteText(n)}${grp}`
+    })
+
     const lines = [
       `👤 ${profile.name}`,
       ...infoPairs.map(([k, v]) => `${k}: ${v}`),
       `群组: ${profile.groups?.join('、') || '—'}`,
       `标签: ${profile.tags?.join('、') || '—'}`,
-      ...(profile.notes?.slice(-8).map((n) => `  • ${noteText(n)}${typeof n === 'object' && n?.group ? `（${n.group}）` : ''}`) || []),
+      ...noteLines,
       `消息数: ${profile.messageCount || 0}  |  最后活跃: ${profile.lastSeen?.slice(0, 10) || '—'}`,
     ]
     return { handled: true, reply: lines.join('\n') }

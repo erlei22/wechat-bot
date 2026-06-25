@@ -10,11 +10,17 @@
   "notes": [
     {
       "text": "对某些话题好奇但担心得到意外答案",
-      "group": null
+      "group": null,
+      "count": 1,
+      "firstSeen": "2026-06-23T12:21:43.311Z",
+      "lastSeen": "2026-06-23T12:23:06.278Z"
     },
     {
       "text": "对群主感情状况感兴趣，但可能担心直接询问",
-      "group": null
+      "group": null,
+      "count": 1,
+      "firstSeen": "2026-06-23T12:21:43.311Z",
+      "lastSeen": "2026-06-23T12:23:06.278Z"
     }
   ],
   "messageCount": 1,

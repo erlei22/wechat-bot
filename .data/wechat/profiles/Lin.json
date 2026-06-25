@@ -1,0 +1,39 @@
+{
+  "name": "Lin",
+  "gender": "unknown",
+  "ageRange": "",
+  "birthday": "",
+  "zodiac": "",
+  "mbti": "",
+  "occupation": "",
+  "company": "",
+  "city": "",
+  "district": "",
+  "diet": "",
+  "sports": [],
+  "schedule": "",
+  "hobbies": [],
+  "hasCar": null,
+  "canDrive": null,
+  "carInfo": "",
+  "personality": "",
+  "closeFriends": [],
+  "groups": [
+    "虹桥爱博徒步搭子群"
+  ],
+  "tags": [
+    "喜欢徒步"
+  ],
+  "notes": [
+    {
+      "text": "经常在公园步行锻炼，刷步数",
+      "group": "虹桥爱博徒步搭子群",
+      "count": 1,
+      "firstSeen": "2026-06-24T11:52:59.300Z",
+      "lastSeen": "2026-06-24T11:52:59.300Z"
+    }
+  ],
+  "messageCount": 0,
+  "firstSeen": "2026-06-24T11:52:59.300Z",
+  "lastSeen": "2026-06-24T11:52:59.300Z"
+}

@@ -7,7 +7,10 @@
   "notes": [
     {
       "text": "用户对笑话反应平淡，要求再讲一个",
-      "group": null
+      "group": null,
+      "count": 1,
+      "firstSeen": "2026-06-23T12:30:35.373Z",
+      "lastSeen": "2026-06-23T12:30:35.373Z"
     }
   ],
   "messageCount": 1,

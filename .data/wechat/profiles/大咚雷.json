@@ -14,11 +14,17 @@
   "notes": [
     {
       "text": "早晚各铲一次，养宠物且注重卫生。",
-      "group": null
+      "group": null,
+      "count": 1,
+      "firstSeen": "2026-06-23T00:00:00.000Z",
+      "lastSeen": "2026-06-24T08:42:06.283Z"
     },
     {
       "text": "上个月旅游支出约6000元，显示消费水平较高。",
-      "group": "虹桥野生食堂"
+      "group": "虹桥野生食堂",
+      "count": 1,
+      "firstSeen": "2026-06-23T00:00:00.000Z",
+      "lastSeen": "2026-06-24T08:42:06.283Z"
     }
   ],
   "messageCount": 0,

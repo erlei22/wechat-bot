@@ -6,6 +6,8 @@ import { getWechatRuntimeConfig } from '../../config/env.js'
 import { extractFromPassiveMessage } from './store/profileStore.js'
 import { processEventMessage } from './lifecycle/eventLifecycle.js'
 import { throttledSay } from '../../utils/replyQueue.js'
+import { logger } from '../../utils/logger.js'
+import { logError } from './store/errorStore.js'
 
 function onScan(qrcode, status) {
   if (status === ScanStatus.Waiting || status === ScanStatus.Timeout) {
@@ -93,7 +95,14 @@ export function createWechatBot() {
     }
   })
   bot.on('error', (error) => {
-    console.error('bot error handle: ', error)
+    // wechat4u 内部偶发错误（如登录初始化时 status undefined），不影响后续运行，降级为 warn
+    const msg = error?.message || String(error)
+    if (msg.includes('Cannot read properties of undefined')) {
+      logger.warn('[BOT] 协议层内部错误（已忽略）', msg)
+    } else {
+      logger.error('[BOT] error', error)
+      logError('bot', error, {}, config.dataDir)
+    }
   })
 
   return bot
