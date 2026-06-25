@@ -1,5 +1,5 @@
 {
-  "name": "TheRattle",
+  "name": "4399战狼",
   "gender": "unknown",
   "ageRange": "",
   "birthday": "",
@@ -7,31 +7,23 @@
   "mbti": "",
   "occupation": "",
   "company": "",
-  "city": "",
-  "district": "",
+  "city": "上海",
+  "district": "南翔",
   "diet": "",
-  "sports": [
-    "俯卧撑",
-    "负重深蹲"
-  ],
+  "sports": [],
   "schedule": "",
-  "hobbies": [
-    "风水",
-    "海鲜/出海",
-    "电脑硬件"
-  ],
+  "hobbies": [],
   "hasCar": null,
   "canDrive": null,
   "carInfo": "",
   "personality": "",
   "closeFriends": [],
   "groups": [
-    "虹桥爱博徒步搭子群",
     "虹桥野生食堂"
   ],
   "tags": [],
   "notes": [],
   "messageCount": 0,
-  "firstSeen": "2026-06-25T06:21:10.840Z",
-  "lastSeen": "2026-06-25T06:45:06.925Z"
+  "firstSeen": "2026-06-25T08:50:41.513Z",
+  "lastSeen": "2026-06-25T08:50:41.515Z"
 }

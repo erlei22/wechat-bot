@@ -1,6 +1,8 @@
 {
   "name": "冬冬2",
-  "groups": [],
+  "groups": [
+    "徒步小分队"
+  ],
   "tags": [
     "毒蛇对象",
     "真的坏"
@@ -30,7 +32,7 @@
   ],
   "messageCount": 0,
   "firstSeen": "2026-06-23T00:00:00.000Z",
-  "lastSeen": "2026-06-23T00:00:00.000Z",
+  "lastSeen": "2026-06-25T07:56:25.831Z",
   "gender": "unknown",
   "ageRange": "",
   "birthday": "",
@@ -41,7 +43,9 @@
   "city": "",
   "district": "",
   "diet": "",
-  "sports": [],
+  "sports": [
+    "引体向上"
+  ],
   "schedule": "",
   "hobbies": [],
   "hasCar": null,

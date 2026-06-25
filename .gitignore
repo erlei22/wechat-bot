@@ -8,5 +8,9 @@ Chromium.app
 .DS_Store
 .idea
 .codegraph
+
 # 日志目录，随时可删
 logs/
+
+# SQLite 数据库：二进制文件，不进 git，用 scripts/deploy.sh 单独同步
+.data/wechat/messages.db

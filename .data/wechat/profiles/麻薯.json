@@ -2,14 +2,17 @@
   "name": "麻薯",
   "groups": [
     "徒步小分队",
-    "虹桥野生食堂"
+    "虹桥野生食堂",
+    "虹桥爱博徒步搭子群"
   ],
   "tags": [
     "新手司机",
     "游戏开发者",
     "水瓶座",
     "暖男",
-    "徒步苦难户"
+    "徒步苦难户",
+    "有车",
+    "电动车"
   ],
   "notes": [
     {
@@ -46,11 +49,25 @@
       "count": 1,
       "firstSeen": "2026-06-25T06:32:59.064Z",
       "lastSeen": "2026-06-25T06:32:59.064Z"
+    },
+    {
+      "text": "晚上洗车充电",
+      "group": "虹桥野生食堂",
+      "count": 1,
+      "firstSeen": "2026-06-25T08:55:14.055Z",
+      "lastSeen": "2026-06-25T08:55:14.055Z"
+    },
+    {
+      "text": "吃烧烤",
+      "group": "虹桥野生食堂",
+      "count": 1,
+      "firstSeen": "2026-06-25T08:55:14.055Z",
+      "lastSeen": "2026-06-25T08:55:14.055Z"
     }
   ],
   "messageCount": 1,
   "firstSeen": "2026-06-23T00:00:00.000Z",
-  "lastSeen": "2026-06-25T06:32:59.064Z",
+  "lastSeen": "2026-06-25T08:55:14.055Z",
   "gender": "unknown",
   "ageRange": "",
   "birthday": "",
@@ -58,17 +75,20 @@
   "mbti": "",
   "occupation": "",
   "company": "",
-  "city": "",
+  "city": "上海",
   "district": "",
   "diet": "芝士",
   "sports": [],
   "schedule": "",
   "hobbies": [
-    "拍照（出片）"
+    "拍照（出片）",
+    "编程",
+    "喂猫",
+    "烧烤"
   ],
   "hasCar": true,
   "canDrive": true,
-  "carInfo": "",
+  "carInfo": "电动车（充电）",
   "personality": "",
   "closeFriends": []
 }

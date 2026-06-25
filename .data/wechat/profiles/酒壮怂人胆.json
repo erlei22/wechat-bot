@@ -24,11 +24,25 @@
       "count": 1,
       "firstSeen": "2026-06-24T08:43:45.080Z",
       "lastSeen": "2026-06-24T10:11:58.739Z"
+    },
+    {
+      "text": "脚扭伤",
+      "group": "虹桥野生食堂",
+      "count": 1,
+      "firstSeen": "2026-06-25T07:10:35.158Z",
+      "lastSeen": "2026-06-25T07:10:35.158Z"
+    },
+    {
+      "text": "使用热敷",
+      "group": "虹桥野生食堂",
+      "count": 1,
+      "firstSeen": "2026-06-25T07:10:35.158Z",
+      "lastSeen": "2026-06-25T07:10:35.158Z"
     }
   ],
   "messageCount": 0,
   "firstSeen": "2026-06-24T08:43:45.080Z",
-  "lastSeen": "2026-06-24T10:11:58.739Z",
+  "lastSeen": "2026-06-25T07:10:35.158Z",
   "ageRange": "",
   "birthday": "",
   "zodiac": "",

@@ -13,5 +13,22 @@
     "status": "upcoming",
     "createdAt": "2026-06-25T06:19:43.336Z",
     "updatedAt": "2026-06-25T06:20:04.311Z"
+  },
+  {
+    "id": "1782371467323",
+    "title": "晚上去吃六姐火锅烤肉",
+    "type": "聚餐",
+    "date": "2026-06-25",
+    "time": "",
+    "location": "六姐",
+    "initiator": "酒壮怂人胆",
+    "participants": [
+      "酒壮怂人胆"
+    ],
+    "notes": "",
+    "room": "虹桥野生食堂",
+    "status": "upcoming",
+    "createdAt": "2026-06-25T07:11:07.323Z",
+    "updatedAt": "2026-06-25T07:11:07.323Z"
   }
 ]

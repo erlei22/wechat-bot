@@ -19,6 +19,9 @@
     "lark:login": "node ./cli.js lark login",
     "opencli": "node ./cli.js opencli",
     "wx": "node ./cli.js wx",
+    "deploy": "bash scripts/deploy.sh",
+    "deploy:code": "bash scripts/deploy.sh --code-only",
+    "deploy:data": "bash scripts/deploy.sh --data-only",
     "prepare": "npx husky"
   },
   "lint-staged": {

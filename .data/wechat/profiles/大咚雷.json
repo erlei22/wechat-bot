@@ -2,7 +2,8 @@
   "name": "大咚雷",
   "groups": [
     "徒步小分队",
-    "虹桥野生食堂"
+    "虹桥野生食堂",
+    "虹桥爱博徒步搭子群"
   ],
   "tags": [
     "群友",
@@ -29,7 +30,7 @@
   ],
   "messageCount": 0,
   "firstSeen": "2026-06-23T00:00:00.000Z",
-  "lastSeen": "2026-06-24T08:42:06.283Z",
+  "lastSeen": "2026-06-25T08:08:48.566Z",
   "gender": "unknown",
   "ageRange": "",
   "birthday": "",
@@ -39,10 +40,12 @@
   "company": "",
   "city": "",
   "district": "",
-  "diet": "",
+  "diet": "蛤蜊，啤酒",
   "sports": [],
   "schedule": "",
-  "hobbies": [],
+  "hobbies": [
+    "旅行"
+  ],
   "hasCar": null,
   "canDrive": null,
   "carInfo": "",
