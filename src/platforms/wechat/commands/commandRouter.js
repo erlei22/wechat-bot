@@ -134,7 +134,6 @@ export async function handleAdminCommand(content, context = {}) {
     const lines = [
       `👤 ${profile.name}`,
       ...infoPairs.map(([k, v]) => `${k}: ${v}`),
-      `群组: ${profile.groups?.join('、') || '—'}`,
       `标签: ${profile.tags?.join('、') || '—'}`,
       ...noteLines,
       `消息数: ${profile.messageCount || 0}  |  最后活跃: ${profile.lastSeen?.slice(0, 10) || '—'}`,

@@ -1,31 +1,29 @@
 {
-  "name": "道格",
+  "name": "Zoey",
   "gender": "unknown",
   "ageRange": "",
   "birthday": "",
   "zodiac": "",
   "mbti": "",
-  "occupation": "",
+  "occupation": "空乘",
   "company": "",
-  "city": "",
+  "city": "上海",
   "district": "",
   "diet": "",
-  "sports": [
-    "running"
-  ],
+  "sports": [],
   "schedule": "",
   "hobbies": [],
   "hasCar": null,
   "canDrive": null,
   "carInfo": "",
-  "personality": "黏人",
+  "personality": "",
   "closeFriends": [],
   "groups": [
-    "虹桥野生食堂"
+    "徒步小分队"
   ],
   "tags": [],
   "notes": [],
   "messageCount": 0,
-  "firstSeen": "2026-06-25T06:42:59.798Z",
-  "lastSeen": "2026-06-25T10:33:38.187Z"
+  "firstSeen": "2026-06-25T11:05:30.986Z",
+  "lastSeen": "2026-06-25T11:05:30.987Z"
 }

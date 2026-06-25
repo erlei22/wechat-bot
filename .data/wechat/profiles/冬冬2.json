@@ -28,11 +28,25 @@
       "count": 1,
       "firstSeen": "2026-06-23T00:00:00.000Z",
       "lastSeen": "2026-06-23T00:00:00.000Z"
+    },
+    {
+      "text": "体虚，引体向上拉不了一个",
+      "group": "徒步小分队",
+      "count": 1,
+      "firstSeen": "2026-06-25T09:38:51.321Z",
+      "lastSeen": "2026-06-25T09:38:51.321Z"
+    },
+    {
+      "text": "晚上吃得少",
+      "group": "徒步小分队",
+      "count": 1,
+      "firstSeen": "2026-06-25T09:38:51.321Z",
+      "lastSeen": "2026-06-25T09:38:51.321Z"
     }
   ],
   "messageCount": 0,
   "firstSeen": "2026-06-23T00:00:00.000Z",
-  "lastSeen": "2026-06-25T07:56:25.831Z",
+  "lastSeen": "2026-06-25T12:01:12.364Z",
   "gender": "unknown",
   "ageRange": "",
   "birthday": "",
@@ -42,7 +56,7 @@
   "company": "",
   "city": "",
   "district": "",
-  "diet": "",
+  "diet": "不吃辣",
   "sports": [
     "引体向上"
   ],
@@ -51,6 +65,6 @@
   "hasCar": null,
   "canDrive": null,
   "carInfo": "",
-  "personality": "",
+  "personality": "外向",
   "closeFriends": []
 }

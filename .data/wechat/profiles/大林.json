@@ -2,7 +2,8 @@
   "name": "大林",
   "gender": "unknown",
   "groups": [
-    "虹桥野生食堂"
+    "虹桥野生食堂",
+    "虹桥爱博徒步搭子群"
   ],
   "tags": [
     "细心",
@@ -15,11 +16,18 @@
       "count": 1,
       "firstSeen": "2026-06-24T08:40:32.549Z",
       "lastSeen": "2026-06-24T08:40:32.549Z"
+    },
+    {
+      "text": "怕鱼刺，偏好无刺鱼",
+      "group": "虹桥爱博徒步搭子群",
+      "count": 1,
+      "firstSeen": "2026-06-25T09:28:38.200Z",
+      "lastSeen": "2026-06-25T09:28:38.200Z"
     }
   ],
   "messageCount": 0,
   "firstSeen": "2026-06-24T08:40:32.549Z",
-  "lastSeen": "2026-06-24T08:40:32.549Z",
+  "lastSeen": "2026-06-25T09:28:38.200Z",
   "ageRange": "",
   "birthday": "",
   "zodiac": "",
@@ -28,7 +36,7 @@
   "company": "",
   "city": "",
   "district": "",
-  "diet": "",
+  "diet": "偏好无刺鱼",
   "sports": [],
   "schedule": "",
   "hobbies": [],

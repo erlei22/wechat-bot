@@ -8,11 +8,11 @@
     "location": "",
     "initiator": "道格",
     "participants": [],
-    "notes": "",
+    "notes": "五分钟",
     "room": "虹桥野生食堂",
     "status": "upcoming",
     "createdAt": "2026-06-25T06:19:43.336Z",
-    "updatedAt": "2026-06-25T06:20:04.311Z"
+    "updatedAt": "2026-06-25T11:06:08.021Z"
   },
   {
     "id": "1782371467323",
@@ -22,13 +22,11 @@
     "time": "",
     "location": "六姐",
     "initiator": "酒壮怂人胆",
-    "participants": [
-      "酒壮怂人胆"
-    ],
-    "notes": "",
+    "participants": [],
+    "notes": "六姐、火锅、烤肉三选一",
     "room": "虹桥野生食堂",
     "status": "upcoming",
     "createdAt": "2026-06-25T07:11:07.323Z",
-    "updatedAt": "2026-06-25T07:11:07.323Z"
+    "updatedAt": "2026-06-25T09:55:02.817Z"
   }
 ]

@@ -82,7 +82,7 @@ export function createWechatBot() {
         if (config.aliasWhiteList.includes(talkerAlias) || config.aliasWhiteList.includes(talkerName)) {
           extractFromPassiveMessage(senderKey, message.text(), roomName, config.dataDir).catch(() => { })
         }
-        // 活动生命周期：创建二次确认 / 仅发起者可改删 / 报名引导找发起者。
+        // 活动生命周期：创建二次确认 / 仅发起者可改删 / 报名自助（说"我要去"即加进名单）。
         // 对群里所有人开放（不限白名单），按群隔离。机器人需要回复时发到群里并 @ 发言人。
         processEventMessage({ text: message.text(), senderKey, roomName, dataDir: config.dataDir })
           .then((reply) => {

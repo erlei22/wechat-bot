@@ -17,7 +17,7 @@
   ],
   "messageCount": 0,
   "firstSeen": "2026-06-23T13:03:25.664Z",
-  "lastSeen": "2026-06-23T13:03:25.664Z",
+  "lastSeen": "2026-06-25T10:52:19.862Z",
   "gender": "unknown",
   "ageRange": "",
   "birthday": "",
@@ -28,7 +28,9 @@
   "city": "",
   "district": "",
   "diet": "",
-  "sports": [],
+  "sports": [
+    "骑行"
+  ],
   "schedule": "",
   "hobbies": [],
   "hasCar": null,

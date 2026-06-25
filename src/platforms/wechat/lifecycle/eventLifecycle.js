@@ -20,7 +20,8 @@ const env = { ...dotenv.config().parsed, ...process.env }
 //  - 新增活动：LLM 识别后先挂起为 pending，机器人请发起者确认，回复"确认"才落库。
 //  - 删除活动：仅发起者可发起删除，二次确认后才删。
 //  - 修改活动：仅发起者本人的消息能改。
-//  - 参加活动：机器人不自动拉人，引导报名者去找发起者。
+//  - 参加活动：自助报名，谁说"我要去"就把谁加进名单；退出同理（移除自己）。
+//    增减他人 / 改活动细节仍仅发起者可做。
 // ---------------------------------------------------------------------------
 
 // 每个群最多一个待确认操作；内存存储，重启即失效（可接受）。
@@ -116,7 +117,7 @@ function commitPending(pend, roomName, dataDir) {
       '',
       `后续操作：`,
       `• 补充信息 → ${newEvent.initiator} 直接说"集合地点在XX"、"改成8点"，我会自动更新`,
-      `• 想参加 → 找发起者 ${newEvent.initiator} 报名，TA 说了算`,
+      `• 想参加 → 直接发"我要去"/"算我一个"，我帮你记上名单`,
       `• 取消活动 → ${newEvent.initiator} 说"取消活动"即可`,
     ].join('\n')
   }
@@ -205,16 +206,23 @@ export function applyEventIntent(intent, { senderKey, roomName, dataDir }) {
     }
 
     case 'join': {
-      // 机器人不自动拉人，引导报名者去找发起者
+      // 自助报名：谁想参加就直接把本人加进名单，不用发起者确认
       if (!intent.targetId) return null
       const events = loadGroupEvents(roomName, dataDir)
-      const ev = events.find((x) => x.id === intent.targetId && x.status !== 'cancelled')
-      if (!ev) return null
-      const who = ev.initiator || '发起者'
-      const current = (ev.participants || []).join('、') || '暂无'
+      const idx = events.findIndex((x) => x.id === intent.targetId && x.status !== 'cancelled')
+      if (idx < 0) return null
+      const ev = events[idx]
+      const roster = ev.participants || []
+      if (roster.includes(senderKey)) {
+        return `${senderKey} 已经在「${ev.title}」名单里啦～当前 ${roster.length} 人：${roster.join('、')}`
+      }
+      ev.participants = [...roster, senderKey]
+      ev.updatedAt = now
+      saveGroupEvents(roomName, events, dataDir)
       return [
-        `想参加「${ev.title}」？找 ${who} 确认一下～`,
-        `当前参与者：${current}`,
+        `✅ 已把 ${senderKey} 加进「${ev.title}」`,
+        `当前 ${ev.participants.length} 人：${ev.participants.join('、')}`,
+        `（去不了了说一声「我不去了」就帮你撤下）`,
       ].join('\n')
     }
 
@@ -246,7 +254,7 @@ export function applyEventIntent(intent, { senderKey, roomName, dataDir }) {
         if (e.participants?.length) meta.push(`已报名 ${e.participants.length} 人：${e.participants.join('、')}`)
         if (meta.length) lines.push(`   ${meta.join('　')}`)
       }
-      lines.push('想参加的直接找发起人报名哈～')
+      lines.push('想参加直接说"我要去"/"算我一个"，我帮你记上～')
       return lines.join('\n')
     }
 

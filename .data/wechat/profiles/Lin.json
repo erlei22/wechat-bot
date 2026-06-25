@@ -10,7 +10,9 @@
   "city": "",
   "district": "",
   "diet": "",
-  "sports": [],
+  "sports": [
+    "walking"
+  ],
   "schedule": "",
   "hobbies": [],
   "hasCar": null,
@@ -35,5 +37,5 @@
   ],
   "messageCount": 0,
   "firstSeen": "2026-06-24T11:52:59.300Z",
-  "lastSeen": "2026-06-24T11:52:59.300Z"
+  "lastSeen": "2026-06-25T10:52:15.008Z"
 }

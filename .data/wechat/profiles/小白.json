@@ -21,11 +21,18 @@
       "count": 1,
       "firstSeen": "2026-06-23T12:21:43.311Z",
       "lastSeen": "2026-06-23T12:23:06.278Z"
+    },
+    {
+      "text": "小区溜达",
+      "group": "虹桥爱博徒步搭子群",
+      "count": 1,
+      "firstSeen": "2026-06-25T11:16:57.430Z",
+      "lastSeen": "2026-06-25T11:16:57.430Z"
     }
   ],
   "messageCount": 1,
   "firstSeen": "2026-06-23T12:21:43.311Z",
-  "lastSeen": "2026-06-25T09:03:15.291Z",
+  "lastSeen": "2026-06-25T11:16:57.430Z",
   "gender": "unknown",
   "ageRange": "",
   "birthday": "",
@@ -38,10 +45,13 @@
   "diet": "",
   "sports": [],
   "schedule": "周五有空",
-  "hobbies": [],
+  "hobbies": [
+    "拍照",
+    "摄影"
+  ],
   "hasCar": null,
   "canDrive": null,
   "carInfo": "",
-  "personality": "",
+  "personality": "胆小",
   "closeFriends": []
 }

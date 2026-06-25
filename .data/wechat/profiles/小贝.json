@@ -1,5 +1,5 @@
 {
-  "name": "道格",
+  "name": "小贝",
   "gender": "unknown",
   "ageRange": "",
   "birthday": "",
@@ -11,21 +11,21 @@
   "district": "",
   "diet": "",
   "sports": [
-    "running"
+    "漂流"
   ],
   "schedule": "",
   "hobbies": [],
   "hasCar": null,
   "canDrive": null,
   "carInfo": "",
-  "personality": "黏人",
+  "personality": "",
   "closeFriends": [],
   "groups": [
-    "虹桥野生食堂"
+    "虹桥爱博徒步搭子群"
   ],
   "tags": [],
   "notes": [],
   "messageCount": 0,
-  "firstSeen": "2026-06-25T06:42:59.798Z",
-  "lastSeen": "2026-06-25T10:33:38.187Z"
+  "firstSeen": "2026-06-25T11:18:29.791Z",
+  "lastSeen": "2026-06-25T11:18:29.792Z"
 }

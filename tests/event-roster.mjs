@@ -37,9 +37,17 @@ check('发起者移除成功', !loadGroupEvents(room, dataDir)[0].participants.i
 const q = applyEventIntent({ action: 'query' }, { senderKey: '甲', roomName: room, dataDir })
 check('query 播报含已报名人数', q.includes('已报名') && q.includes('麻薯'))
 
-// join 仍引导找发起者（不自动加）
+// join 自助报名：直接把本人加进名单（无需发起者确认）
 const j = applyEventIntent({ action: 'join', targetId: 'e1' }, { senderKey: '新人', roomName: room, dataDir })
-check('join 仍引导找发起者', j.includes('找') && !loadGroupEvents(room, dataDir)[0].participants.includes('新人'))
+check('join 自助报名加入成功', j.includes('已把') && loadGroupEvents(room, dataDir)[0].participants.includes('新人'))
+
+// 已在名单里再报名 → 友好提示，不重复加
+const jDup = applyEventIntent({ action: 'join', targetId: 'e1' }, { senderKey: '新人', roomName: room, dataDir })
+check('重复报名不重复加', jDup.includes('已经在') && loadGroupEvents(room, dataDir)[0].participants.filter((p) => p === '新人').length === 1)
+
+// leave 自助退出：移除自己
+applyEventIntent({ action: 'leave', targetId: 'e1' }, { senderKey: '新人', roomName: room, dataDir })
+check('leave 自助退出成功', !loadGroupEvents(room, dataDir)[0].participants.includes('新人'))
 
 fs.rmSync(dataDir, { recursive: true, force: true })
 console.log(`\n${pass} passed, ${fail} failed`)
