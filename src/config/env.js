@@ -37,6 +37,10 @@ export function getWechatRuntimeConfig() {
     privateChatAI: env.PRIVATE_CHAT_AI === 'true',
     // AI 回复前缀标记，让接收方能区分这是机器人而非真人。设为空串可关闭。
     aiReplyMarker: env.AI_REPLY_MARKER !== undefined ? env.AI_REPLY_MARKER : '🤖 ',
+    // 多轮对话：每个群保留最近 N 轮 Q&A 作为上下文传给 DeepSeek。
+    // 0 = 关闭（完全无状态）；默认 3 轮，让对话感觉有关联。
+    // 可通过 MULTI_ROUND_TURNS=0 还原为无状态模式。
+    multiRoundTurns: parseInt(env.MULTI_ROUND_TURNS ?? '30', 10),
   }
 }
 

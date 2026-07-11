@@ -4,8 +4,8 @@ import path, { dirname } from 'path'
 import { fileURLToPath } from 'url'
 import { env, getWechatRuntimeConfig } from './config/env.js'
 import { analyzeWechatMessages } from './analysis/wechatAnalyzer.js'
-import { larkListMessages, larkLogin, larkSearchMessages, larkSendText, larkStatus } from './adapters/lark.js'
-import { runOpenCli, runWxCli } from './adapters/opencli.js'
+import { larkListMessages, larkLogin, larkSearchMessages, larkSendText, larkStatus } from './platforms/lark/index.js'
+import { runOpenCli, runWxCli } from './platforms/cli/opencli.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)

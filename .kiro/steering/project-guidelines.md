@@ -5,8 +5,28 @@
 ## 项目背景
 
 基于 Wechaty 的微信 / IM agent。消息链路：
-`bot.js (收消息) → sendMessage.js (分发) → DeepSeek (deepseek/index.js，function calling) → throttledSay (replyQueue.js) 发回`。
-数据：画像 `profileStore.js`、按群隔离的活动 `eventStore.js`、反馈/错误 sqlite（`feedbackStore.js` / `errorStore.js`）、管理指令 `commandRouter.js`。配置走 `config/env.js` + `.env`。
+`platforms/wechat/bot.js → platforms/wechat/sendMessage.js → providers/deepseek/index.js (function calling) → utils/replyQueue.js throttledSay 发回`。
+
+目录结构（重构后）：
+```
+src/
+├── config/                env.js
+├── analysis/              wechatAnalyzer.js
+├── utils/                 replyQueue.js、process.js
+├── providers/             deepseek/index.js、openai/index.js
+└── platforms/
+    ├── wechat/            bot.js、sendMessage.js、serve.js、whitelistConfig.js
+    │   ├── store/         profileStore、eventStore、feedbackStore、errorStore、messageStore
+    │   ├── commands/      commandRouter、botTools
+    │   └── lifecycle/     eventLifecycle、patternConfig
+    ├── lark/              index.js
+    └── cli/               opencli.js、pi.js
+
+scripts/                   migrate-messages.js
+tests/                     *.mjs
+```
+
+配置走 `config/env.js` + `.env`。
 
 ## 何时用 LLM，何时用代码（重要，默认自行判断）
 

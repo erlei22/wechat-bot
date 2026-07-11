@@ -1,10 +1,10 @@
 import { WechatyBuilder, ScanStatus, log } from 'wechaty'
 import qrTerminal from 'qrcode-terminal'
-import { defaultMessage } from '../../wechaty/sendMessage.js'
-import { captureWechatMessage } from './messageStore.js'
+import { defaultMessage } from './sendMessage.js'
+import { captureWechatMessage } from './store/messageStore.js'
 import { getWechatRuntimeConfig } from '../../config/env.js'
-import { extractFromPassiveMessage } from './profileStore.js'
-import { processEventMessage } from './eventLifecycle.js'
+import { extractFromPassiveMessage } from './store/profileStore.js'
+import { processEventMessage } from './lifecycle/eventLifecycle.js'
 import { throttledSay } from '../../utils/replyQueue.js'
 
 function onScan(qrcode, status) {
